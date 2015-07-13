@@ -1,0 +1,7 @@
+.DS_Store
+.Trashes
+
+app/bower_components/
+app/npm-debug.log
+node_modules/
+

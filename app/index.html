@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+  <head lang="en">
+    <meta charset="utf-8" />
+    <title>Custom Plunker</title>
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="services/angular-join.js"></script>
+    <script src="app.js"></script>
+    <script src="services/data.js"></script>
+    <script src="controllers/main.js"></script>
+    
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="app.css">
+  </head>
+
+  <body ng-controller="MyCtrl">
+    <h1>Data1</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="d in data1">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.cats}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data2</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="d in data2">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data3</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="d in data3">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data4</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="d in data4">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+
+</html>
+

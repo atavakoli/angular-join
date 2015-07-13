@@ -1,0 +1,16 @@
+{
+  "name": "angular-join",
+  "description": "An AngularJS service for RDBMS join operations",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.4",
+    "jquery": "~1.11",
+    "bootstrap": "~3.3",
+    "moment": "~2.10",
+    "angular-bootstrap": "~0.13"
+  },
+  "resolutions": {
+    "angular": "~1.4"
+  }
+}
