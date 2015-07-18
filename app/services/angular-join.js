@@ -4,12 +4,17 @@
 angular.module('angular-join', [])
 
 .factory('Join', function() {
+
+  /********
+   * JOIN *
+   ********/
+
   function mergeJoin(a1, a2, comparator, callback, options) {
     var a3 = [];
   
-    if (options && options.sort) {
-      a1.sort(comparator);
-      a2.sort(comparator);
+    if (!options || !options.sorted) {
+      a1 = a1.slice().sort(comparator);
+      a2 = a2.slice().sort(comparator);
     }
 
     function getContiguousLength(src, start) {
@@ -140,9 +145,52 @@ angular.module('angular-join', [])
     return a3;
   }
 
+  /************
+   * GROUP BY *
+   ************/
+
+  function sortGroupBy(a, comparator, callback, options) {
+    var results = [];
+
+    if (!options || !options.sorted) {
+      a = a.slice().sort(comparator);
+    }
+
+    var grouped = callback(null, a[0]);
+
+    for (var i = 1; i < a.length; ++i) {
+      if (comparator(a[i-1], a[i]) === 0) {
+        grouped = callback(grouped, a[i]);
+      } else {
+        results.push(grouped);
+        grouped = callback(null, a[i]);
+      }
+    }
+    results.push(grouped);
+
+    return results;
+  }
+
+  function hashGroupBy(a, hashFcn, callback) {
+    var hashTable = {};
+
+    for (var i = 0; i < a.length; ++i) {
+      var e = a[i];
+      var hash = hashFcn(e, i, a);
+      var grouped = hashTable[hash];
+      hashTable[hash] = callback(grouped || null, e);
+    }
+
+    return Object.keys(hashTable).map(function(hash) {
+      return hashTable[hash];
+    });
+  }
+
   return {
     mergeJoin: mergeJoin,
-    hashJoin: hashJoin
+    hashJoin: hashJoin,
+    sortGroupBy: sortGroupBy,
+    hashGroupBy: hashGroupBy
   };
 });
 
