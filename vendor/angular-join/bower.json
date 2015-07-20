@@ -1,0 +1,31 @@
+{
+  "name": "angular-join",
+  "main": "angular-join.js",
+  "homepage": "https://github.com/atavakoli/angular-join",
+  "description": "An AngularJS service for RDBMS join operations",
+  "keywords": [
+    "angular",
+    "join",
+    "database",
+    "rdbms",
+    "service"
+  ],
+  "authors": [
+    "Ali Tavakoli"
+  ],
+  "dependencies": {
+    "angular": ">=1.3.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:atavakoli/angular-join.git"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

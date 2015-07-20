@@ -1,0 +1,11 @@
+{
+  "name": "angular-join",
+  "description": "An AngularJS service for RDBMS join operations",
+  "devDependencies": {
+    "bower": ">=1.3.x"
+  },
+  "scripts": {
+    "postinstall": "bower install",
+    "prestart": "npm install"
+  }
+}

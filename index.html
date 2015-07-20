@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+  <head lang="en">
+    <meta charset="utf-8" />
+    <title>Custom Plunker</title>
+    <script src="vendor/moment/moment.js"></script>
+    <script src="vendor/jquery/dist/jquery.min.js"></script>
+    <script src="vendor/angular/angular.js"></script>
+    <script src="vendor/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="vendor/d3/d3.min.js"></script>
+    <script src="vendor/c3/c3.min.js"></script>
+    <script src="vendor/angular-c3-directive/angular-c3.js"></script>
+    <script src="vendor/angular-join/angular-join.js"></script>
+    <script src="app.js"></script>
+    <script src="services/yield.js"></script>
+    <script src="services/data.js"></script>
+    <script src="controllers/main.js"></script>
+    
+    <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="vendor/c3/c3.min.css">
+    <link rel="stylesheet" href="app.css">
+  </head>
+
+  <body ng-controller="MyCtrl">
+    <div ng-repeat="(key, val) in modes">
+      <button type="button" class="btn btn-default" ng-click="runTest(key)">
+        {{key}}
+      </button>
+      <button type="button" class="btn btn-default" ng-click="runFullTest(key)">
+        {{key}}: Full
+      </button>
+    </div>
+
+    <input type="number" ng-model="size">
+
+    <div c3="chart"></div>
+
+    <p>Data Build: {{dataBuildTime || 0}} ms</p>
+    <p>Sort: {{sortTime || 0}} ms</p>
+    <p>Merge Join: {{mergeTime || 0}} ms</p>
+    <p>Hash Join: {{hashTime || 0}} ms</p>
+
+    <p>Data 1: {{data1.length || 0}} rows</p>
+    <p>Data 2: {{data2.length || 0}} rows</p>
+    <p>Merge Join: {{data3.length || 0}} rows</p>
+    <p>Hash Join: {{data4.length || 0}} rows</p>
+
+    <div ng-if="false">
+    <h1>Data1</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATS</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data1">
+          <td>{{d.i}}</td>
+          <td>{{d.cats}}</td>
+        </tr>
+        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data1">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.cats}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data2</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATSDA</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data2">
+          <td>{{d.i}}</td>
+          <td>{{d.catsDa}}</td>
+        </tr>
+        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data2">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data3</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data3">
+          <td>{{d.i}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data3">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h1>Data4</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data4">
+          <td>{{d.i}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data4">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
+          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </body>
+
+</html>
+
