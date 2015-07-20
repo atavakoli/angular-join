@@ -1,8 +1,8 @@
 angular-join
 ============
 
-An AngularJS service providing RDBMS `JOIN` functionality for JavaScript
-arrays.
+An AngularJS service providing RDBMS `JOIN` & `GROUP BY` functionality for
+JavaScript arrays.
 
 Installation
 ------------
@@ -20,6 +20,9 @@ In your Angular app declaration, inject the `angular-join` dependency:
 ```
 angular.module('myApp', ['angular-join'])
 ```
+
+This will make available the `Join` service, which provides the functions
+below.
 
 Usage
 -----

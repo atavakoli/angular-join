@@ -1,7 +1,7 @@
 .DS_Store
 .Trashes
 
-app/bower_components/
-app/npm-debug.log
+bower_components/
+npm-debug.log
 node_modules/
 

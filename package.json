@@ -1,19 +1,11 @@
 {
   "name": "angular-join",
   "description": "An AngularJS service for RDBMS join operations",
-  "version": "0.0.0",
-  "private": true,
   "devDependencies": {
-    "http-server": "~0.6",
-    "bower": "~1.4"
+    "bower": ">=1.3.x"
   },
   "scripts": {
     "postinstall": "bower install",
-
-    "prestart": "npm install",
-    "start": "http-server -a localhost -p 8000 -c-1",
-
-    "preupdate-webdriver": "npm install",
-    "update-webdriver": "webdriver-manager update"
+    "prestart": "npm install"
   }
 }
