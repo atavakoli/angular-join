@@ -36,6 +36,27 @@ function($scope, Join, DataSvc, Yield) {
           };
         }
       },
+      groupByCompare: function(d1, d2) {
+        var d1mod = d1.i % 10;
+        var d2mod = d2.i % 10;
+        return d1mod - d2mod;
+      },
+      groupByHash: function(d) {
+        return d.i % 10;
+      },
+      groupBySum: function(prevValue, d) {
+        if (!prevValue) {
+          return {
+            i: d.i % 10,
+            cats: d.cats,
+            catsDa: d.catsDa
+          };
+        } else {
+          prevValue.cats += d.cats;
+          prevValue.catsDa += d.catsDa;
+          return prevValue;
+        }
+      },
       data: DataSvc.makeSimpleData
     },
     complex: {
@@ -73,10 +94,30 @@ function($scope, Join, DataSvc, Yield) {
           // right join
           return {
             date: d2.date,
+            ts: d2.ts,
             person: d2.person,
             cats: 0,
             catsDa: d2.catsDa
           };
+        }
+      },
+      groupByCompare: function(d1, d2) {
+        return d1.person.localeCompare(d2.person);
+      },
+      groupByHash: function(d) {
+        return d.person;
+      },
+      groupBySum: function(prevValue, d) {
+        if (!prevValue) {
+          return {
+            person: d.person,
+            cats: d.cats,
+            catsDa: d.catsDa
+          };
+        } else {
+          prevValue.cats += d.cats;
+          prevValue.catsDa += d.catsDa;
+          return prevValue;
         }
       },
       data: DataSvc.makeComplexData
@@ -160,6 +201,14 @@ function($scope, Join, DataSvc, Yield) {
     $scope.data4 = Join.hashJoin($scope.data1, $scope.data2,
                                  $scope.mode.hash, $scope.mode.join);
     $scope.hashTime = performance.now() - t0;
+
+    $scope.data5 = Join.sortGroupBy($scope.data3,
+                                    $scope.mode.groupByCompare,
+                                    $scope.mode.groupBySum);
+
+    $scope.data6 = Join.hashGroupBy($scope.data3,
+                                    $scope.mode.groupByHash,
+                                    $scope.mode.groupBySum);
 
     // $scope.data4.sort($scope.mode.compare);
 

@@ -46,7 +46,7 @@
     <p>Merge Join: {{data3.length || 0}} rows</p>
     <p>Hash Join: {{data4.length || 0}} rows</p>
 
-    <div ng-if="false">
+    <div ng-if="true">
     <h1>Data1</h1>
     <table class="table">
       <thead>
@@ -158,6 +158,65 @@
         </tr>
       </tbody>
     </table>
+
+    <h1>Data5</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode == 'simple'" ng-repeat="d in data5">
+          <td>{{d.i}}</td>
+          <td>{{d.cats}}</td>
+          <td>{{d.catsDa}}</td>
+        <tr ng-if="lastMode == 'complex'" ng-repeat="d in data5">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.cats}}</td>
+          <td>{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h1>Data6</h1>
+    <table class="table">
+      <thead>
+        <tr ng-if="lastMode === 'simple'">
+          <th>Index</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+        <tr ng-if="lastMode === 'complex'">
+          <th>Date</th>
+          <th>Person</th>
+          <th>CATS</th>
+          <th>CATSDA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-if="lastMode == 'simple'" ng-repeat="d in data6">
+          <td>{{d.i}}</td>
+          <td>{{d.cats}}</td>
+          <td>{{d.catsDa}}</td>
+        <tr ng-if="lastMode == 'complex'" ng-repeat="d in data6">
+          <td>{{d.date.format('YYYY-MM-DD')}}</td>
+          <td>{{d.person}}</td>
+          <td>{{d.cats}}</td>
+          <td>{{d.catsDa}}</td>
+        </tr>
+      </tbody>
+    </table>
+
     </div>
   </body>
 
