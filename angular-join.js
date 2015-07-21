@@ -96,13 +96,19 @@ angular.module('angular-join', [])
       hashed = a1;
       scanned = a2;
       addCallback = function(h, s) {
-        a3.push(callback(h, s));
+        var newElement = callback(h, s);
+        if (newElement) {
+          a3.push(newElement);
+        }
       };
     } else {
       hashed = a2;
       scanned = a1;
       addCallback = function(h, s) {
-        a3.push(callback(s, h));
+        var newElement = callback(s, h);
+        if (newElement) {
+          a3.push(newElement);
+        }
       };
     }
     
