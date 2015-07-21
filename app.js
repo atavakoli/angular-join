@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('myApp', ['ui.bootstrap', 'angular-join', 'c3']);
+angular.module('angularJoinDemo', ['ui.bootstrap', 'angular-join']);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<html ng-app="angularJoinDemo">
 
   <head lang="en">
     <meta charset="utf-8" />
@@ -13,210 +13,91 @@
     <script src="vendor/angular-c3-directive/angular-c3.js"></script>
     <script src="vendor/angular-join/angular-join.js"></script>
     <script src="app.js"></script>
-    <script src="services/yield.js"></script>
-    <script src="services/data.js"></script>
-    <script src="controllers/main.js"></script>
+    <script src="controllers/nav.js"></script>
+    <script src="controllers/join-demo.js"></script>
+    <script src="controllers/groupby-demo.js"></script>
     
     <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="vendor/c3/c3.min.css">
     <link rel="stylesheet" href="app.css">
   </head>
 
-  <body ng-controller="MyCtrl">
-    <div ng-repeat="(key, val) in modes">
-      <button type="button" class="btn btn-default" ng-click="runTest(key)">
-        {{key}}
-      </button>
-      <button type="button" class="btn btn-default" ng-click="runFullTest(key)">
-        {{key}}: Full
-      </button>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavCtrl">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" ng-click="collapsed = !collapsed">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand">angular-join</a>
+        </div>
+        <div class="navbar-collapse" collapse="collapsed">
+        </div>
+      </div>
+    </nav>
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Angular JOIN</h1>
+        <p>
+          Simple, fast, and powerful RDBMS functionality on your JavaScript arrays.
+        </p>
+      </div>
     </div>
 
-    <input type="number" ng-model="size">
-
-    <div c3="chart"></div>
-
-    <p>Data Build: {{dataBuildTime || 0}} ms</p>
-    <p>Sort: {{sortTime || 0}} ms</p>
-    <p>Merge Join: {{mergeTime || 0}} ms</p>
-    <p>Hash Join: {{hashTime || 0}} ms</p>
-
-    <p>Data 1: {{data1.length || 0}} rows</p>
-    <p>Data 2: {{data2.length || 0}} rows</p>
-    <p>Merge Join: {{data3.length || 0}} rows</p>
-    <p>Hash Join: {{data4.length || 0}} rows</p>
-
-    <div ng-if="true">
-    <h1>Data1</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATS</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATS</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data1">
-          <td>{{d.i}}</td>
-          <td>{{d.cats}}</td>
-        </tr>
-        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data1">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td>{{d.cats}}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <h1>Data2</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATSDA</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATSDA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data2">
-          <td>{{d.i}}</td>
-          <td>{{d.catsDa}}</td>
-        </tr>
-        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data2">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td>{{d.catsDa}}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <h1>Data3</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data3">
-          <td>{{d.i}}</td>
-          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
-          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
-        </tr>
-        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data3">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
-          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <h1>Data4</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode === 'simple'" ng-repeat="d in data4">
-          <td>{{d.i}}</td>
-          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
-          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
-        </tr>
-        <tr ng-if="lastMode === 'complex'" ng-repeat="d in data4">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td ng-class="getClass(d, data1, 'cats')">{{d.cats}}</td>
-          <td ng-class="getClass(d, data2, 'catsDa')">{{d.catsDa}}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h1>Data5</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode == 'simple'" ng-repeat="d in data5">
-          <td>{{d.i}}</td>
-          <td>{{d.cats}}</td>
-          <td>{{d.catsDa}}</td>
-        <tr ng-if="lastMode == 'complex'" ng-repeat="d in data5">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td>{{d.cats}}</td>
-          <td>{{d.catsDa}}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h1>Data6</h1>
-    <table class="table">
-      <thead>
-        <tr ng-if="lastMode === 'simple'">
-          <th>Index</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-        <tr ng-if="lastMode === 'complex'">
-          <th>Date</th>
-          <th>Person</th>
-          <th>CATS</th>
-          <th>CATSDA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-if="lastMode == 'simple'" ng-repeat="d in data6">
-          <td>{{d.i}}</td>
-          <td>{{d.cats}}</td>
-          <td>{{d.catsDa}}</td>
-        <tr ng-if="lastMode == 'complex'" ng-repeat="d in data6">
-          <td>{{d.date.format('YYYY-MM-DD')}}</td>
-          <td>{{d.person}}</td>
-          <td>{{d.cats}}</td>
-          <td>{{d.catsDa}}</td>
-        </tr>
-      </tbody>
-    </table>
-
+    <div class="container" ng-controller="JoinDemoCtrl">
+      <div class="row" ng-repeat-start="demo in demos">
+        <h2>{{demo.name}}</h2>
+        <div class="col-md-6">
+          <h3>Left Table</h3>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th ng-repeat="field in demo.inFields">{{field}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in demo.data1">
+                <td ng-repeat="field in demo.inFields">{{row[field]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <h3>Right Table</h3>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th ng-repeat="field in demo.inFields">{{field}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in demo.data2">
+                <td ng-repeat="field in demo.inFields">{{row[field]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row" ng-repeat-end>
+        <div class="col-md-12">
+          <h3>Joined</h3>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th ng-repeat="field in demo.outFields">{{field}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in demo.results.merge">
+                <td ng-repeat="field in demo.outFields">{{row[field]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </body>
 
