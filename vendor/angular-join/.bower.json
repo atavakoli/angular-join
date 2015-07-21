@@ -33,7 +33,7 @@
   "_resolution": {
     "type": "version",
     "tag": "0.1.0",
-    "commit": "1779f0f8df4ab5d4184427ac2f438e0270fb7f12"
+    "commit": "71415b45a69507fed678c2bbcc9663f9d10907e7"
   },
   "_source": "git://github.com/atavakoli/angular-join.git",
   "_target": "*",

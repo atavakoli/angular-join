@@ -6,12 +6,7 @@
     "angular": "~1.4",
     "jquery": "~1.11",
     "bootstrap": "~3.3",
-    "moment": "~2.10",
     "angular-bootstrap": "~0.13",
-    "angular-join": "latest",
-    "angular-c3-directive": "latest"
-  },
-  "resolutions": {
-    "angular": "~1.4"
+    "angular-join": "latest"
   }
 }
