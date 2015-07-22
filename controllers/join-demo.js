@@ -226,6 +226,8 @@ angular.module('angularJoinDemo')
   }
 
   $scope.demos.forEach(function(demo) {
+    demo.showing = 'table';
+
     demo.results = {
       merge: Join.mergeJoin(demo.data1, demo.data2, demo.compare, demo.join),
       hash: Join.hashJoin(demo.data1, demo.data2, demo.hash, demo.join)

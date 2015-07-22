@@ -54,18 +54,23 @@
     </div>
 
     <div class="container" ng-controller="JoinDemoCtrl">
-      <div class="row" ng-repeat="demo in demos">
+      <div class="row" ng-repeat-start="demo in demos">
         <h2>{{demo.name}}</h2>
         <ul class="nav nav-tabs">
-          <li role="presentation" ng-class="{active: !demo.showingCode}">
-            <a ng-click="demo.showingCode = false">Results</a>
+          <li role="presentation" ng-class="{active: demo.showing == 'table'}">
+            <a ng-click="demo.showing = 'table'">Results (Tables)</a>
           </li>
-          <li role="presentation" ng-class="{active: demo.showingCode}">
-            <a ng-click="demo.showingCode = true">Code</a>
+          <li role="presentation" ng-class="{active: demo.showing == 'json'}">
+            <a ng-click="demo.showing = 'json'">Results (JSON)</a>
+          </li>
+          <li role="presentation" ng-class="{active: demo.showing == 'code'}">
+            <a ng-click="demo.showing = 'code'">Code</a>
           </li>
         </ul>
+      </div>
 
-        <div class="col-md-3" ng-if="!demo.showingCode">
+      <div class="row" ng-if="demo.showing == 'table'">
+        <div class="col-md-3">
           <h3>Left Array</h3>
           <table class="table table-bordered table-striped">
             <thead>
@@ -80,7 +85,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-md-3" ng-if="!demo.showingCode">
+        <div class="col-md-3">
           <h3>Right Array</h3>
           <table class="table table-bordered table-striped">
             <thead>
@@ -95,7 +100,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-md-6" ng-if="!demo.showingCode">
+        <div class="col-md-6">
           <h3>Joined</h3>
           <table class="table table-bordered table-striped">
             <thead>
@@ -110,14 +115,31 @@
             </tbody>
           </table>
         </div>
+      </div>
 
-        <div class="col-md-6" ng-if="demo.showingCode">
-          <h3>Hash Join</h3>
-          <div hljs class="demo-code" source="demo.code.hash"></div>
+      <div class="row" ng-if="demo.showing == 'json'">
+        <div class="col-md-3">
+          <h3>Left Array</h3>
+          <div hljs source="demo.data1 | json"></div>
         </div>
-        <div class="col-md-6" ng-if="demo.showingCode">
+        <div class="col-md-3">
+          <h3>Right Array</h3>
+          <div hljs source="demo.data2 | json"></div>
+        </div>
+        <div class="col-md-6">
+          <h3>Joined</h3>
+          <div hljs source="demo.results.hash | json"></div>
+        </div>
+      </div>
+
+      <div class="row" ng-repeat-end ng-if="demo.showing == 'code'">
+        <div class="col-md-6">
+          <h3>Hash Join</h3>
+          <div hljs source="demo.code.hash"></div>
+        </div>
+        <div class="col-md-6">
           <h3>Merge Join</h3>
-          <div hljs class="demo-code" source="demo.code.merge"></div>
+          <div hljs source="demo.code.merge"></div>
         </div>
       </div>
     </div>
