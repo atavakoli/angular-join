@@ -4,13 +4,13 @@ angular.module('angularJoinDemo')
   $scope.demos = [
     {
       name: 'Inner Join',
-      data1: [
+      left: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
         { x: 4, y: 4 }
       ],
-      data2: [
+      right: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
@@ -39,13 +39,13 @@ angular.module('angularJoinDemo')
 
     {
       name: 'Left Outer Join',
-      data1: [
+      left: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
         { x: 4, y: 4 }
       ],
-      data2: [
+      right: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
@@ -80,13 +80,13 @@ angular.module('angularJoinDemo')
 
     {
       name: 'Right Outer Join',
-      data1: [
+      left: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
         { x: 4, y: 4 }
       ],
-      data2: [
+      right: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
@@ -122,13 +122,13 @@ angular.module('angularJoinDemo')
 
     {
       name: 'Full Outer Join',
-      data1: [
+      left: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
         { x: 4, y: 4 }
       ],
-      data2: [
+      right: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 },
@@ -166,13 +166,13 @@ angular.module('angularJoinDemo')
     },
 
     {
-      name: 'Cartesian Join',
-      data1: [
+      name: 'Cartesian/Cross Join',
+      left: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 }
       ],
-      data2: [
+      right: [
         { x: 1, y: 1 },
         { x: 2, y: 2 },
         { x: 3, y: 3 }
@@ -201,21 +201,45 @@ angular.module('angularJoinDemo')
 
   ];
 
+  var indentRegex = /^ */;
+  function toSource(fcn, indent) {
+    var fcnSource = fcn.toString();
+
+    // Find the shortest indent after the 1st line (1st line is unindented)
+    var shortest = fcnSource
+      .split(/\n/)
+      .slice(1)
+      .reduce(function(prev, line) {
+        var thisIndent = indentRegex.exec(line)[0];
+        if (!prev || thisIndent.length < prev.length) {
+          return thisIndent;
+        } else {
+          return prev;
+        }
+      }, null);
+
+    // Replace the shortest indent with the provided indent
+    if (shortest) {
+      var shortestRegex = RegExp('^' + shortest, 'mg');
+      return fcnSource.replace(shortestRegex, indent);
+    } else {
+      return fcnSource;
+    }
+  }
+
   function buildDemoCode(demo, type) {
     var indent = '  ';
-    var indentRegex = /^      /mg;
-
     var fcnNameString;
     var compareFcnString;
     if (type === 'hash') {
       fcnNameString = 'Join.hashJoin';
-      compareFcnString = demo.hash.toString().replace(indentRegex, indent);
+      compareFcnString = toSource(demo.hash, indent);
     } else {
       fcnNameString = 'Join.mergeJoin';
-      compareFcnString = demo.compare.toString().replace(indentRegex, indent);
+      compareFcnString = toSource(demo.compare, indent);
     }
 
-    var joinFcnString = demo.join.toString().replace(indentRegex, indent);
+    var joinFcnString = toSource(demo.join, indent);
 
     return 'var joined = ' + fcnNameString + '(\n' +
            '  left,\n' +
@@ -229,8 +253,8 @@ angular.module('angularJoinDemo')
     demo.showing = 'table';
 
     demo.results = {
-      merge: Join.mergeJoin(demo.data1, demo.data2, demo.compare, demo.join),
-      hash: Join.hashJoin(demo.data1, demo.data2, demo.hash, demo.join)
+      merge: Join.mergeJoin(demo.left, demo.right, demo.compare, demo.join),
+      hash: Join.hashJoin(demo.left, demo.right, demo.hash, demo.join)
     };
 
     demo.code = {
