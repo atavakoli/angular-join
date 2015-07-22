@@ -23,7 +23,7 @@ angular.module('angularJoinDemo')
         return e.x;
       },
       join: function(e1, e2) {
-        if (!!e1 && !!e2) {
+        if (e1 && e2) {
           return {
             x: e1.x,
             y1: e1.y,
@@ -58,7 +58,7 @@ angular.module('angularJoinDemo')
         return e.x;
       },
       join: function(e1, e2) {
-        if (!!e1 && !!e2) {
+        if (e1 && e2) {
           return {
             x: e1.x,
             y1: e1.y,
@@ -99,7 +99,7 @@ angular.module('angularJoinDemo')
         return e.x;
       },
       join: function(e1, e2) {
-        if (!!e1 && !!e2) {
+        if (e1 && e2) {
           return {
             x: e1.x,
             y1: e1.y,
@@ -141,7 +141,7 @@ angular.module('angularJoinDemo')
         return e.x;
       },
       join: function(e1, e2) {
-        if (!!e1 && !!e2) {
+        if (e1 && e2) {
           return {
             x: e1.x,
             y1: e1.y,
@@ -184,7 +184,7 @@ angular.module('angularJoinDemo')
         return 1; //any value will do
       },
       join: function(e1, e2) {
-        if (!!e1 && !!e2) {
+        if (e1 && e2) {
           return {
             x1: e1.x,
             x2: e2.x,
@@ -203,18 +203,19 @@ angular.module('angularJoinDemo')
 
   function buildDemoCode(demo, type) {
     var indent = '  ';
+    var indentRegex = /^      /mg;
 
     var fcnNameString;
     var compareFcnString;
     if (type === 'hash') {
       fcnNameString = 'Join.hashJoin';
-      compareFcnString = demo.hash.toString().replace(/^      /mg, indent);
+      compareFcnString = demo.hash.toString().replace(indentRegex, indent);
     } else {
       fcnNameString = 'Join.mergeJoin';
-      compareFcnString = demo.compare.toString().replace(/^      /mg, indent);
+      compareFcnString = demo.compare.toString().replace(indentRegex, indent);
     }
 
-    var joinFcnString = demo.join.toString().replace(/^      /mg, indent);
+    var joinFcnString = demo.join.toString().replace(indentRegex, indent);
 
     return 'var joined = ' + fcnNameString + '(\n' +
            '  left,\n' +
