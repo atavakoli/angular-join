@@ -201,10 +201,38 @@ angular.module('angularJoinDemo')
 
   ];
 
+  function buildDemoCode(demo, type) {
+    var indent = '  ';
+
+    var fcnNameString;
+    var compareFcnString;
+    if (type === 'hash') {
+      fcnNameString = 'Join.hashJoin';
+      compareFcnString = demo.hash.toString().replace(/^      /mg, indent);
+    } else {
+      fcnNameString = 'Join.mergeJoin';
+      compareFcnString = demo.compare.toString().replace(/^      /mg, indent);
+    }
+
+    var joinFcnString = demo.join.toString().replace(/^      /mg, indent);
+
+    return 'var joined = ' + fcnNameString + '(\n' +
+           '  left,\n' +
+           '  right,\n' +
+           '  ' + compareFcnString + ',\n' +
+           '  ' + joinFcnString + '\n' +
+           ');';
+  }
+
   $scope.demos.forEach(function(demo) {
     demo.results = {
       merge: Join.mergeJoin(demo.data1, demo.data2, demo.compare, demo.join),
       hash: Join.hashJoin(demo.data1, demo.data2, demo.hash, demo.join)
+    };
+
+    demo.code = {
+      merge: buildDemoCode(demo, 'merge'),
+      hash: buildDemoCode(demo, 'hash')
     };
   });
 }]);

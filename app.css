@@ -1,3 +1,8 @@
 .nav, .pagination, .carousel, .panel-title a {
   cursor: pointer;
 }
+
+.hljs {
+  /* To match Bootstrap's <pre> background-color */
+  background-color: #f5f5f5;
+}
