@@ -38,6 +38,43 @@ angular.module('angularJoinDemo')
     },
 
     {
+      name: 'Inner Join with Duplicates',
+      left: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3.1 },
+        { x: 3, y: 3.2 },
+        { x: 4, y: 4 }
+      ],
+      right: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3.3 },
+        { x: 3, y: 3.4 },
+        { x: 5, y: 5 }
+      ],
+      compare: function(e1, e2) {
+        return e1.x - e2.x;
+      },
+      hash: function(e) {
+        return e.x;
+      },
+      join: function(e1, e2) {
+        if (e1 && e2) {
+          return {
+            x: e1.x,
+            y1: e1.y,
+            y2: e2.y
+          };
+        } else {
+          return null;
+        }
+      },
+      inFields: ['x', 'y'],
+      outFields: ['x', 'y1', 'y2']
+    },
+
+    {
       name: 'Left Outer Join',
       left: [
         { x: 1, y: 1 },
@@ -197,6 +234,68 @@ angular.module('angularJoinDemo')
       },
       inFields: ['x', 'y'],
       outFields: ['x1', 'x2', 'y1', 'y2']
+    },
+
+    {
+      name: 'Left Anti-Join',
+      left: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3 },
+        { x: 4, y: 4 }
+      ],
+      right: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3 },
+        { x: 5, y: 5 }
+      ],
+      compare: function(e1, e2) {
+        return e1.x - e2.x;
+      },
+      hash: function(e) {
+        return e.x;
+      },
+      join: function(e1, e2) {
+        if (e1 && !e2) {
+          return e1;
+        } else {
+          return null;
+        }
+      },
+      inFields: ['x', 'y'],
+      outFields: ['x', 'y']
+    },
+
+    {
+      name: 'Right Anti-Join',
+      left: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3 },
+        { x: 4, y: 4 }
+      ],
+      right: [
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3 },
+        { x: 5, y: 5 }
+      ],
+      compare: function(e1, e2) {
+        return e1.x - e2.x;
+      },
+      hash: function(e) {
+        return e.x;
+      },
+      join: function(e1, e2) {
+        if (e2 && !e1) {
+          return e2;
+        } else {
+          return null;
+        }
+      },
+      inFields: ['x', 'y'],
+      outFields: ['x', 'y']
     },
 
   ];
