@@ -28,14 +28,15 @@
     "test",
     "tests"
   ],
-  "version": "0.1.0",
-  "_release": "0.1.0",
+  "version": "0.1.1",
+  "_release": "0.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.0",
-    "commit": "71415b45a69507fed678c2bbcc9663f9d10907e7"
+    "tag": "0.1.1",
+    "commit": "836b5662889f43444963f03a4ee8b0afce694880"
   },
   "_source": "git://github.com/atavakoli/angular-join.git",
-  "_target": "*",
-  "_originalSource": "angular-join"
+  "_target": "~0.1.1",
+  "_originalSource": "angular-join",
+  "_direct": true
 }
