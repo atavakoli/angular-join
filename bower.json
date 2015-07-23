@@ -5,6 +5,7 @@
   "dependencies": {
     "jquery": "~1.11",
     "bootstrap": "~3.3",
+    "headroom.js": "~0.7",
     "angular": "~1.4",
     "angular-route": "~1.4",
     "angular-bootstrap": "~0.13",

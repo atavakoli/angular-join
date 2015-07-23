@@ -4,9 +4,30 @@
 
 body {
   padding-top: 50px;
+  padding-bottom: 70px;
 }
 
 .hljs {
   /* To match Bootstrap's <pre> background-color */
   background-color: #f5f5f5;
+}
+
+.headroom {
+  -webkit-transition: -webkit-transform 200ms linear;
+          transition: transform 200ms linear;
+}
+.headroom--pinned {
+  -webkit-transform: translateY(0%);
+      -ms-transform: translateY(0%);
+          transform: translateY(0%);
+}
+.headroom--unpinned {
+  -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+          transform: translateY(-100%);
+}
+.headroom--unpinned-down {
+  -webkit-transform: translateY(100%);
+      -ms-transform: translateY(100%);
+          transform: translateY(100%);
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('angularJoinDemo',
-  ['ngRoute', 'ui.bootstrap', 'hljs', 'angular-join'])
+  ['ngRoute', 'ui.bootstrap', 'hljs', 'headroom', 'angular-join'])
 
 .config(['$routeProvider', '$locationProvider', 'Routes',
 function($routeProvider, $locationProvider, Routes) {
