@@ -1,0 +1,181 @@
+<div class="jumbotron text-center">
+  <div class="container">
+    <h1>Angular JOIN</h1>
+    <p>
+      Simple, fast, and powerful RDBMS functionality on your JavaScript arrays.
+    </p>
+    <p>
+      <a class="btn btn-default btn-lg" href="//github.com/atavakoli/angular-join">
+        <img src="img/GitHub-Mark-32px.png" width="18" height="18"> View on GitHub
+      </a>
+      <a class="btn btn-default btn-lg"
+         href="//github.com/atavakoli/angular-join/archive/0.1.0.zip">
+        <span class="glyphicon glyphicon-download-alt"></span> Download ZIP
+      </a>
+      <a class="btn btn-default btn-lg"
+         href="//github.com/atavakoli/angular-join/archive/0.1.0.tar.gz">
+        <span class="glyphicon glyphicon-download-alt"></span> Download tar.gz
+      </a>
+    </p>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Installation</h1>
+
+  <p>If you're using <a href="//bower.io">Bower</a>:</p>
+  <div hljs include="'intro/install'" language="bash"></div>
+  <p>
+    Otherwise, go to the
+    <a href="//github.com/atavakoli/angular-join">GitHub project</a>
+    or use one of the download links above.
+  </p>
+
+  <h1>Setup</h1>
+
+  <p>Angular JOIN does not require any dependencies beside Angular itself.</p>
+
+  <ol>
+    <li>
+      <p>Include the <code>angular-join.js</code> script in your HTML:</p>
+      <div hljs source="setup1" language="html"></div>
+    </li>
+
+    <li>
+      <p>Add <code>'angular-join'</code> as a dependency in your Angular app:</p>
+      <div hljs include="'intro/setup2'" language="js"></div>
+    </li>
+
+    <li>
+      <p>
+        Inject <code>'Join'</code> in your Angular modules as needed.
+        For example:
+      </p>
+      <div hljs include="'intro/setup3'" language="js"></div>
+    </li>
+  </ol>
+
+  <h1>Usage</h1>
+
+  <p>
+    This module provides the <code>Join</code> service, which exposes functions
+    to perform SQL-JOIN and SQL-GROUP-BY style operations on JavaScript arrays.
+  </p>
+
+  <h2>hashJoin</h2>
+
+  <p>
+    This function implements a version of the
+    <a href="https://en.wikipedia.org/wiki/Hash_join">Hash Join</a> algorithm.
+    It is appropriate when the source arrays are small and unsorted, and if
+    the resulting array does not need to be returned in any particular order.
+    For large sorted arrays, <code>mergeJoin</code> is much more efficient.
+  </p>
+
+  <div hljs include="'intro/hashJoin1'" language="js"></div>
+
+  <h4>Arguments</h4>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><code>left</code></td>
+        <td><span class="label label-warning">array</span></td>
+        <td>
+          The lefthand array in the join operation.
+        </td>
+      </tr>
+      <tr>
+        <td><code>right</code></td>
+        <td><span class="label label-warning">array</span></td>
+        <td>
+          The righthand array in the join operation.
+        </td>
+      </tr>
+      <tr>
+        <td><code>hashFcn</code></td>
+        <td><span class="label label-success">function</span></td>
+        <td>
+          <p>
+            Function executed as <code>hashFcn(e)</code>, where <code>e</code> is
+            elements of <code>left</code> and <code>right</code>, and returning
+            a number or string. Values of <code>e</code> for which the same value
+            is returned are considered equal and will be joined as specified by
+            the <code>callback</code> function.
+          </p>
+          <p>
+            Returning the same value for all inputs can be used to implement
+            cross/cartesian joins (though a nested pair of for loops may be
+            more efficient).
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td><code>callback</code></td>
+        <td><span class="label label-success">function</span></td>
+        <td>
+          <p>
+            Function executed as <code>callback(e1, e2)</code>, where
+            <code>e1</code> and <code>e2</code> are elements of <code>left</code>
+            and <code>right</code>, respectively (or <code>null</code>; see
+            below). If the returned value is not falsy, it is added to the
+            the array returned by <code>hashJoin</code>.
+          </p>
+          <p>
+            For each pair of <code>e1</code> and <code>e2</code> where
+            <code>hashFcn(e1) == hashFcn(e2)</code>, <code>callback(e1, e2)</code>
+            is called once per pair. Returning a value only when neither
+            <code>e1</code> or <code>e2</code> are null can be used to implement
+            inner joins.
+          </p>
+          <p>
+            For each <code>e1</code> where there is no matching <code>e2</code>,
+            <code>callback(e1, null)</code> is called once. Correspondingly,
+            for each <code>e2</code> where there is no matching <code>e1</code>,
+            <code>callback(null, e2)</code> is called once. Returning a value
+            in these cases can be used to implement left/right/full outer joins.
+          </p>
+          <p>
+            Returning a value when <em>only</em> one of <code>e1</code> or
+            <code>e2</code> can be used to implement left/right anti-joins.
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Returns</h4>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><span class="label label-warning">array</span></td>
+        <td>
+          The join of <code>left</code> and <code>right</code>: for each call to
+          <code>callback(left[m], right[n])</code> returning a non-falsey value,
+          that element is added to the returned array.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script id="intro/install" type="text/ng-template">
+bower install angular-join --save
+</script>
+
+<script id="intro/setup2" type="text/ng-template">
+angular.module('myApp', ['angular-join']);
+</script>
+
+<script id="intro/setup3" type="text/ng-template">
+angular.module('myApp')
+.controller('MyCtrl', ['$scope', 'Join', function($scope, Join) {
+  // Use the Join service
+}]);
+</script>
+
+<script id="intro/hashJoin1" type="text/ng-template">
+Join.hashJoin(left, right, hashFcn, callback)
+</script>
+
+

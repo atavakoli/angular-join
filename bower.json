@@ -3,9 +3,10 @@
   "description": "Demo page for the angular-join project",
   "private": true,
   "dependencies": {
-    "angular": "~1.4",
     "jquery": "~1.11",
     "bootstrap": "~3.3",
+    "angular": "~1.4",
+    "angular-route": "~1.4",
     "angular-bootstrap": "~0.13",
     "angular-highlightjs": "~0.4",
     "angular-join": "latest"
