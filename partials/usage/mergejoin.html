@@ -1,0 +1,112 @@
+<p>
+  This function implements a version of the
+  <a href="//en.wikipedia.org/wiki/Sort-merge_join">Sort-Merge Join</a> algorithm.
+  It is much more efficient than <code>hashJoin</code> when the source arrays
+  already sorted (see <code>options.sorted</code> below).
+</p>
+
+<div hljs language="js">Join.mergeJoin(left, right, comparator, callback[, options])</div>
+
+<h4>Arguments</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>left</code></td>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The lefthand array in the join operation.
+      </td>
+    </tr>
+    <tr>
+      <td><code>right</code></td>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The righthand array in the join operation.
+      </td>
+    </tr>
+    <tr>
+      <td><code>comparator</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>comparator(e1, e2)</code>, where
+          <code>e1</code> and <code>e2</code> are elements of <code>left</code>
+          and <code>right</code>, respectively, and has the exact same spec as
+          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            compareFunction in Array.prototype.sort()
+          </a>.
+          If <code>comparator(e1, e2) === 0</code>, then <code>e1</code>
+          and <code>e2</code> are considered equal and will be joined as
+          specified by the <code>callback</code> function.
+        </p>
+        <p>
+          Returning <code>0</code> for all inputs can be used to implement
+          cross/cartesian joins (though a nested pair of for-loops may be
+          more efficient).
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>callback</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>callback(e1, e2)</code>, where
+          <code>e1</code> and <code>e2</code> are elements of <code>left</code>
+          and <code>right</code>, respectively (or <code>null</code>; see
+          below). If the returned value is not falsy, it is added to the array
+          returned by <code>mergeJoin</code>.
+        </p>
+        <p>
+          For each pair of <code>e1</code> and <code>e2</code> where
+          <code>comparator(e1, e2) === 0</code>, <code>callback(e1, e2)</code>
+          is called once per pair. Returning a value only when neither
+          <code>e1</code> or <code>e2</code> are null can be used to implement
+          inner joins.
+        </p>
+        <p>
+          For each <code>e1</code> where there is no matching <code>e2</code>,
+          <code>callback(e1, null)</code> is called once. Correspondingly,
+          for each <code>e2</code> where there is no matching <code>e1</code>,
+          <code>callback(null, e2)</code> is called once. Returning a value
+          in these cases can be used to implement left/right/full outer joins.
+        </p>
+        <p>
+          Returning a value when <em>only</em> one of <code>e1</code> or
+          <code>e2</code> can be used to implement left/right anti-joins.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>options</code></td>
+      <td><span class="label label-default">object</span></td>
+      <td>
+        <p><em>Optional</em></p>
+        Object containing the following properties:
+        <ul>
+          <li>
+            <code>sorted</code>
+            <span class="label label-primary">boolean</span> :
+            If <code>true</code>, this signifies that both input arrays are
+            already sorted according to <code>comparator</code>. This provides
+            a significant performance boost. Default is <code>false</code>.
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Returns</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The join of <code>left</code> and <code>right</code>: for each call to
+        <code>callback(left[m], right[n])</code> returning a non-falsey value,
+        that element is added to the returned array.
+      </td>
+    </tr>
+  </tbody>
+</table>

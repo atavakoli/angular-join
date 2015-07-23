@@ -11,6 +11,12 @@ angular.module('angularJoinDemo')
       controller: 'IntroCtrl'
     },
     {
+      path: '/usage',
+      title: 'Usage',
+      templateUrl: 'partials/usage.html',
+      controller: 'UsageCtrl'
+    },
+    {
       path: '/join',
       title: 'Join Demo',
       templateUrl: 'partials/join.html',

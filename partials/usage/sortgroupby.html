@@ -1,0 +1,111 @@
+<p>
+  This function implements sort-based GROUP BY functionality on arrays; it is
+  similar to
+  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce">
+    Array.prototype.reduce()
+  </a>,
+  except that the returned result is always an array and the
+  <code>previousValue</code> is the last value returned for the group that the
+  <code>currentValue</code> belongs to, according to <code>comparator</code>.
+  It is slightly more efficient than <code>hashGroupBy</code> if the input
+  array is already sorted (see <code>options</code> below).
+</p>
+
+<div hljs language="js">Join.sortGroupBy(input, comparator, callback, options)</div>
+
+<h4>Arguments</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>input</code></td>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The input array in the group-by operation.
+      </td>
+    </tr>
+    <tr>
+      <td><code>comparator</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>comparator(e1, e2)</code>, where
+          <code>e1</code> and <code>e2</code> are elements of <code>input</code>,
+          and has the exact same spec as
+          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            compareFunction in Array.prototype.sort()
+          </a>.
+          If <code>comparator(e1, e2) === 0</code>, then <code>e1</code>
+          and <code>e2</code> are considered to be part of the same group with
+          respect to calls to the <code>callback</code> function.
+        </p>
+        <p>
+          Returning <code>0</code> for all inputs will result in a return value
+          equivalent to <code>[input.reduce(callback, null)]</code>.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>callback</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>callback(previousValue, e)</code>, where
+          <code>e</code> is an element of <code>input</code> and
+          <code>previousValue</code> is the last value returned by
+          <code>callback</code> for the group to which <code>e</code> belongs.
+          If <code>e</code> is the first element in its group, then
+          <code>previousValue === null</code>. The last value returned for each
+          group is included in the array returned by <code>sortGroupBy</code>.
+        </p>
+        <p>
+          This function must always return a value.
+        </p>
+        <p>
+          Always returning <code>e</code>, or always returning
+          <code>previousValue</code> if it is not null, can be used to implement
+          DISTINCT functionality (i.e. only one element from <code>input</code> per
+          group is included in the final returned array).
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>options</code></td>
+      <td><span class="label label-default">object</span></td>
+      <td>
+        <p><em>Optional</em></p>
+        Object containing the following properties:
+        <ul>
+          <li>
+            <code>sorted</code>
+            <span class="label label-primary">boolean</span> :
+            If <code>true</code>, this signifies that <code>input</code> is
+            already sorted with respect to <code>comparator</code>. This
+            provides a slight performance boost. Default is <code>false</code>.
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Returns</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        <p>
+          An array having one element per group (as defined by
+          <code>comparator</code>), where that element is the last value
+          returned by <code>callback</code> for that group.
+        </p>
+        <p>
+          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">
+            Array.prototype.filter()
+          </a>
+          may be called on the returned array to implement HAVING functionality.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>

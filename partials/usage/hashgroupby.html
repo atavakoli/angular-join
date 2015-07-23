@@ -1,0 +1,88 @@
+<p>
+  This function implements hash-based GROUP BY functionality on arrays; it is
+  similar to
+  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce">
+    Array.prototype.reduce()
+  </a>,
+  except that the returned result is always an array and the
+  <code>previousValue</code> is the last value returned for the group that the
+  <code>currentValue</code> belongs to, according to <code>hashFcn</code>.
+</p>
+
+<div hljs language="js">Join.hashGroupBy(input, hashFcn, callback)</div>
+
+<h4>Arguments</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>input</code></td>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The input array in the group-by operation.
+      </td>
+    </tr>
+    <tr>
+      <td><code>hashFcn</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>hashFcn(e)</code>, where <code>e</code> is
+          an element of <code>input</code>, and returning a number or string.
+          Values of <code>e</code> for which <code>hashFcn(e)</code> returns the
+          same value are considered to be in the same group with respect to
+          calls to the <code>callback</code> function.
+        </p>
+        <p>
+          Returning the same value for all inputs will result in a return value
+          equivalent to <code>[input.reduce(callback, null)]</code>.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>callback</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>callback(previousValue, e)</code>, where
+          <code>e</code> is an element of <code>input</code> and
+          <code>previousValue</code> is the last value returned by
+          <code>callback</code> for the group to which <code>e</code> belongs.
+          If <code>e</code> is the first element in its group, then
+          <code>previousValue === null</code>. The last value returned for each
+          group is included in the array returned by <code>sortGroupBy</code>.
+        </p>
+        <p>
+          This function must always return a value.
+        </p>
+        <p>
+          Always returning <code>e</code>, or always returning
+          <code>previousValue</code> if it is not null, can be used to implement
+          DISTINCT functionality (i.e. only one element from <code>input</code> per
+          group is included in the final returned array).
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Returns</h4>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        <p>
+          An array having one element per group (as defined by
+          <code>hashFcn</code>), where that element is the last value returned
+          by <code>callback</code> for that group.
+        </p>
+        <p>
+          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">
+            Array.prototype.filter()
+          </a>
+          may be called on the returned array to implement HAVING functionality.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
