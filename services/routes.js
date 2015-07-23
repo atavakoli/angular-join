@@ -21,6 +21,12 @@ angular.module('angularJoinDemo')
       title: 'Join Demo',
       templateUrl: 'partials/join.html',
       controller: 'JoinDemoCtrl'
+    },
+    {
+      path: '/groupby',
+      title: 'Group By Demo',
+      templateUrl: 'partials/groupby.html',
+      controller: 'GroupByDemoCtrl'
     }
   ]
 );

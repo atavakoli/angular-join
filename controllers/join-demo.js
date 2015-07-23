@@ -1,6 +1,7 @@
 angular.module('angularJoinDemo')
 
-.controller('JoinDemoCtrl', ['$scope', 'Join', function($scope, Join) {
+.controller('JoinDemoCtrl', ['$scope', 'Formatter', 'Join',
+function($scope, Formatter, Join) {
   $scope.demos = [
     {
       name: 'Inner Join',
@@ -300,54 +301,6 @@ angular.module('angularJoinDemo')
 
   ];
 
-  var indentRegex = /^ */;
-  function toSource(fcn, indent) {
-    var fcnSource = fcn.toString();
-
-    // Find the shortest indent after the 1st line (1st line is unindented)
-    var shortest = fcnSource
-      .split(/\n/)
-      .slice(1)
-      .reduce(function(prev, line) {
-        var thisIndent = indentRegex.exec(line)[0];
-        if (!prev || thisIndent.length < prev.length) {
-          return thisIndent;
-        } else {
-          return prev;
-        }
-      }, null);
-
-    // Replace the shortest indent with the provided indent
-    if (shortest) {
-      var shortestRegex = RegExp('^' + shortest, 'mg');
-      return fcnSource.replace(shortestRegex, indent);
-    } else {
-      return fcnSource;
-    }
-  }
-
-  function buildDemoCode(demo, type) {
-    var indent = '  ';
-    var fcnNameString;
-    var compareFcnString;
-    if (type === 'hash') {
-      fcnNameString = 'Join.hashJoin';
-      compareFcnString = toSource(demo.hash, indent);
-    } else {
-      fcnNameString = 'Join.mergeJoin';
-      compareFcnString = toSource(demo.compare, indent);
-    }
-
-    var joinFcnString = toSource(demo.join, indent);
-
-    return 'var joined = ' + fcnNameString + '(\n' +
-           '  left,\n' +
-           '  right,\n' +
-           '  ' + compareFcnString + ',\n' +
-           '  ' + joinFcnString + '\n' +
-           ');';
-  }
-
   $scope.demos.forEach(function(demo) {
     demo.showing = 'table';
 
@@ -357,8 +310,12 @@ angular.module('angularJoinDemo')
     };
 
     demo.code = {
-      merge: buildDemoCode(demo, 'merge'),
-      hash: buildDemoCode(demo, 'hash')
+      merge: Formatter.fcnCall(
+        'joined', 'Join.mergeJoin', ['left', 'right', demo.compare, demo.join]
+      ),
+      hash: Formatter.fcnCall(
+        'joined', 'Join.hashJoin', ['left', 'right', demo.hash, demo.join]
+      )
     };
   });
 }]);
