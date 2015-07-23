@@ -36,7 +36,6 @@
     "commit": "836b5662889f43444963f03a4ee8b0afce694880"
   },
   "_source": "git://github.com/atavakoli/angular-join.git",
-  "_target": "~0.1.1",
-  "_originalSource": "angular-join",
-  "_direct": true
+  "_target": "*",
+  "_originalSource": "angular-join"
 }
