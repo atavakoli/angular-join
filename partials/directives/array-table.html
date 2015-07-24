@@ -1,0 +1,32 @@
+<table ng-if="fields.length" class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th ng-repeat="field in fields">{{field}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="row in data track by $index" ng-init="rowIdx = $index"
+        ng-mouseover="showRm = true" ng-mouseleave="showRm = false">
+      <td ng-repeat="field in fields">
+        <div style="position:relative">
+          {{row[field]}}
+          <a href style="position:absolute;right:0" class="text-muted"
+             ng-if="!readonly && $last && $parent.showRm" ng-click="rm(rowIdx)">
+            <span class="glyphicon glyphicon-remove"><span>
+          </a>
+        <div>
+      </td>
+    </tr>
+    <tr ng-if="!readonly">
+      <td ng-repeat="field in fields">
+        <div style="position:relative">
+          <input type="number" style="width:75%" style ng-model="newRow[field]">
+          <a href style="position:absolute;right:0" class="text-muted"
+             ng-if="$last && addEnabled()" ng-click="add()">
+            <span class="glyphicon glyphicon-plus"><span>
+          </button>
+        <div>
+      </td>
+    </tr>
+  </tbody>
+</table>

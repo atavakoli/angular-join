@@ -242,9 +242,7 @@ function($scope, Formatter, Join) {
 
   ];
 
-  $scope.demos.forEach(function(demo) {
-    demo.showing = 'table';
-
+  $scope.updateDemo = function(demo) {
     demo.results = {
       sort: Join.sortGroupBy(demo.input, demo.compare, demo.group),
       hash: Join.hashGroupBy(demo.input, demo.hash, demo.group)
@@ -258,5 +256,10 @@ function($scope, Formatter, Join) {
         'grouped', 'Join.hashGroupBy', ['input', demo.hash, demo.group]
       )
     };
+  };
+
+  $scope.demos.forEach(function(demo) {
+    demo.showing = 'table';
+    $scope.updateDemo(demo);
   });
 }]);

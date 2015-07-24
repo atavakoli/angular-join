@@ -301,9 +301,7 @@ function($scope, Formatter, Join) {
 
   ];
 
-  $scope.demos.forEach(function(demo) {
-    demo.showing = 'table';
-
+  $scope.updateDemo = function(demo) {
     demo.results = {
       merge: Join.mergeJoin(demo.left, demo.right, demo.compare, demo.join),
       hash: Join.hashJoin(demo.left, demo.right, demo.hash, demo.join)
@@ -317,5 +315,10 @@ function($scope, Formatter, Join) {
         'joined', 'Join.hashJoin', ['left', 'right', demo.hash, demo.join]
       )
     };
+  }
+
+  $scope.demos.forEach(function(demo) {
+    demo.showing = 'table';
+    $scope.updateDemo(demo);
   });
 }]);
