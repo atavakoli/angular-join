@@ -215,7 +215,121 @@ angular.module('angular-join', [])
     });
   }
 
+  /********************
+   * FLUENT INTERFACE *
+   ********************/
+
+  function selectFrom(a1, selectCallback) {
+    function callWithThis(fcn) {
+      return function() {
+        var args = [this];
+        for (var i = 0; i < arguments.length; i++) {
+          args.push(arguments[i]);
+        }
+        return fcn.apply(this, args);
+      };
+    }
+
+    var query = {
+      a: a1,
+      ops: [],
+      mergeJoin: function(a2, comparator, callback) {
+        this.ops.push([callWithThis(mergeJoin), a2, comparator, callback]);
+        return this;
+      },
+      hashJoin: function(a2, hashFcn, callback) {
+        this.ops.push([callWithThis(hashJoin), a2, hashFcn, callback]);
+        return this;
+      },
+      sortGroupBy: function(comparator, callback) {
+        this.ops.push([callWithThis(sortGroupBy), comparator, callback]);
+        return this;
+      },
+      hashGroupBy: function(hashFcn, callback) {
+        this.ops.push([callWithThis(hashGroupBy), hashFcn, callback]);
+        return this;
+      },
+      map: function(callback) {
+        this.ops.push([Array.prototype.map, callback]);
+        return this;
+      },
+      select: function(callback) {
+        // just an alias for map
+        return this.map(callback);
+      },
+      filter: function(callback) {
+        this.ops.push([Array.prototype.filter, callback]);
+        return this;
+      },
+      where: function(callback) {
+        // just an alias for filter
+        return this.filter(callback);
+      },
+      having: function(callback) {
+        // just an alias for filter
+        return this.filter(callback);
+      },
+      sort: function(callback) {
+        this.ops.push([function sortCopy(callback) {
+          return this.slice().sort(callback);
+        }, callback]);
+        return this;
+      },
+      orderBy: function(callback) {
+        // just an alias for sort
+        return this.sort(callback);
+      },
+      slice: function(begin, end) {
+        this.ops.push([Array.prototype.slice, begin || 0, end]);
+        return this;
+      },
+      limit: function(len, offset) {
+        offset = offset || 0;
+        return this.slice(offset, len + offset);
+      },
+      offset: function(offset) {
+        // just syntactic sugar for slice with 1 parameter
+        return this.slice(offset || 0);
+      },
+      visit: function(visitor) {
+        this.ops.push([function() { visitor(this); return this; }]);
+        return this;
+      },
+      execute: function(options) {
+        var _self = this;
+
+        function _execute(deferred) {
+          var result = _self.a;
+          _self.ops.forEach(function(op) {
+            result = op[0].apply(result, op.slice(1));
+            if (deferred && deferred.notify) {
+              deferred.notify(result);
+            }
+          });
+          return result;
+        }
+
+        if (!!options && !!options.async) {
+          var deferred = $q.defer();
+          $timeout(function() {
+            deferred.resolve(_execute(deferred));
+          });
+          return deferred.promise;
+        } else {
+          return _execute();
+        }
+      }
+    };
+
+    if (typeof selectCallback == 'function') {
+      query = query.select(selectCallback);
+    }
+
+    return query;
+  }
+
   return {
+    selectFrom: selectFrom,
     mergeJoin: mergeJoin,
     hashJoin: hashJoin,
     sortGroupBy: sortGroupBy,
