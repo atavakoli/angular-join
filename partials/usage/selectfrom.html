@@ -1,0 +1,90 @@
+<div hljs language="sql">SELECT ... FROM input ...</div>
+
+<p>
+  Returns a new query object that uses <code>input</code> as its starting array.
+</p>
+<p>
+  <strong>
+    Note: <code>.selectFrom()</code> is a function of the <code>Join</code>
+    service, and not of a query object.
+  </strong>
+</p>
+<p>
+  This is usually the first in a chain of function calls to create a more
+  complex query. If the optional <code>callback</code> is included, then
+  subsequent operations are applied to a new array whose elements are the
+  return values of <code>callback</code> applied to each element of
+  <code>input</code>. Providing the callback works identically to calling
+  <code>Join.selectFrom(input).select(callback)</code> instead.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">Join
+  .selectFrom(input[, callback])</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>input</code></td>
+      <td><span class="label label-warning">array</span></td>
+      <td>
+        The input array to start the query.
+      </td>
+    </tr>
+    <tr>
+      <td><code>callback</code></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
+      <td>
+        <p><em>Optional</em></p>
+        <p>
+          Function executed as <code>callback(e)</code>, where <code>e</code>
+          is an element of <code>input</code>. This is used to transform the
+          <code>input</code> elements (e.g. by selecting only a subset of their
+          properties) before other operations are chained to the query, and
+          works identically to
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">
+            Array.prototype.map()
+          </a>.
+        </p>
+        <p>
+          If a string is passed in, then only that property of the elements of
+          <code>input</code> is included in the resulting array.
+        </p>
+        <p>
+          If an array of property names is passed in, then only those
+          properties of the elements of <code>input</code> are included in the
+          resulting array.
+        </p>
+        <p>
+          Unlike the SQL SELECT command, which specifies the fields to return
+          at the end of a query, the <code>callback</code> only specifies the
+          array elements to provide to the next operation, meaning if you want
+          SQL-like behaviour, call <code>.select</code> as the last operation
+          in the query.
+        </p>
+        <p>
+          <code>Join.selectFrom(input, callback)</code> is equivalent to
+          <code>Join.selectFrom(input).select(callback)</code>.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object with <code>input</code> (optionally transformed by
+        <code>callback</code>) as the starting array.
+      </td>
+    </tr>
+  </tbody>
+</table>

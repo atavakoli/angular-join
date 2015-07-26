@@ -250,10 +250,10 @@ function($scope, Formatter, Join) {
 
     demo.code = {
       sort: Formatter.fcnCall(
-        'grouped', 'Join.sortGroupBy', ['input', demo.compare, demo.group]
+        'return Join.sortGroupBy(', ['input', demo.compare, demo.group]
       ),
       hash: Formatter.fcnCall(
-        'grouped', 'Join.hashGroupBy', ['input', demo.hash, demo.group]
+        'return Join.hashGroupBy(', ['input', demo.hash, demo.group]
       )
     };
   };

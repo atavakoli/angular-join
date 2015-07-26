@@ -1,0 +1,70 @@
+<div hljs language="sql">SELECT ...
+  ...
+  ; /* THIS PART */
+</div>
+
+<p>
+  Runs the query and returns the resulting array, or a promise object that
+  resolves to the resulting array (see <code>options</code> below).
+</p>
+<p>
+  This function may be called more than once on the same query, but in
+  non-asynchronous mode (which is the default), the query operations are
+  re-executed each time; therefore, it is more efficient in these cases to call
+  it once and save the result.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .execute([options])</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>options</code></td>
+      <td><span class="label label-default">object</span></td>
+      <td>
+        <p><em>Optional</em></p>
+        Object containing the following properties:
+        <ul>
+          <li>
+            <code>async</code>
+            <span class="label label-primary">boolean</span> :
+            If <code>true</code>, then instead of returning the resulting array,
+            execute the query asynchronously and return a
+            <a href="https://docs.angularjs.org/api/ng/service/$q">
+              promise object
+            </a>
+            that resolves to the resulting array. The promise's notify callback
+            will be called on each intermediate array returned by each operation
+            in the query, which may be used for debugging. Default is
+            <code>false</code>.
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td>
+        <p><span class="label label-warning">array</span></p>
+        <p><span class="label label-default">promise</span></p>
+      </td>
+      <td>
+        If the <code>{ async: true }</code> option was not used, the array
+        resulting from executing the query is returned. Otherwise, a
+        <a href="https://docs.angularjs.org/api/ng/service/$q">
+          promise object
+        </a>
+        is returned that resolves to the resulting array, which also gets
+        notified with the intermediate arrays returned by each operation in the
+        query.
+      </td>
+    </tr>
+  </tbody>
+</table>

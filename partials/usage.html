@@ -3,16 +3,97 @@
 
   <p>
     This module provides the <code>Join</code> service, which exposes functions
-    to perform SQL-JOIN and SQL-GROUP-BY style operations on JavaScript arrays.
+    to create SQL-like queries on JavaScript arrays.
+  </p>
+
+  <h2>Examples</h2>
+
+  <p>
+    Below are some examples of SQL queries and their Angular JOIN equivalents:
+  </p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>SQL</th>
+        <th>Angular JOIN</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="example in examples">
+        <td><div hljs source="example.sql" language="sql"></div></td>
+        <td><div hljs source="example.js" language="js"></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Query Object</h2>
+
+  <p>
+    The <span class="label label-danger">query</span> object represents an
+    SQL-like query constructed using the API described below. A query is
+    constructed with a starting array and using method-chaining to queue
+    operations that will transform that array and/or join it to other arrays.
+    Each call will perform the requested operation on the results of the
+    previous operation; this allows a query to be incrementally constructed
+    using a
+    <a href="https://en.wikipedia.org/wiki/Fluent_interface">
+      fluent interface
+    </a>
+    (see examples above).
+  </p>
+
+  <p>
+    New queries are constructed using the <code>Join.selectFrom</code> function,
+    which takes an array as the starting data on which to perform subsequent
+    operations.
+    <strong>
+      Neither the starting array nor any other input arrays are ever modified;
+      all operations create a new array to be returned or passed in as the input
+      of the next operation.
+    </strong>
+  </p>
+
+  <p>
+    None of the operations in the query are performed until the
+    <code>.execute()</code> function is called, which returns the array
+    resulting from sequentially running all the operations queued on the query,
+    which allows them to be constructed in one place and executed in another.
+    If called with the <code>{ async: true }</code> option, a
+    <a href="https://docs.angularjs.org/api/ng/service/$q">promise</a> is
+    returned instead, which is resolved with the final array and notified with
+    the intermediate results of each operation in the query.
   </p>
 
   <div class="row" ng-repeat="usage in usages">
     <hr>
     <div class="col-md-2">
       <h3>{{usage.title}}</h3>
+      <h3 ng-repeat="title in usage.titles track by $index">
+        {{title}}
+      </h3>
     </div>
     <div class="col-md-10">
       <ng-include src="usage.src"></ng-include>
     </div>
   </div>
+
+  <h2>Static functions</h2>
+
+  <p>
+    If all you want to do is use a single operation, all of the functions above
+    (excluding <code>inspect</code>, and <code>execute</code>) have static
+    versions in the <code>Join</code> service. They are called by putting the
+    input array, the one normally passed into <code>selectFrom</code>, as the
+    first argument. In fact, excluding the exceptions above,
+    <code>Join.operation(input, ...)</code> is equivalent to
+    <code>Join.selectFrom(input).operation(...).execute()</code>.
+  </p>
+  <p>
+    The static versions currently do not have an asynchronous mode. That is,
+    there is no way to have them return a
+    <a href="https://docs.angularjs.org/api/ng/service/$q">promise object</a>
+    instead of the resulting array, as can be done on query objects with
+    <code>.execute({async:true})</code>.
+  </p>
 </div>

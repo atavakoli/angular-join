@@ -309,10 +309,10 @@ function($scope, Formatter, Join) {
 
     demo.code = {
       merge: Formatter.fcnCall(
-        'joined', 'Join.mergeJoin', ['left', 'right', demo.compare, demo.join]
+        'return Join.mergeJoin(', ['left', 'right', demo.compare, demo.join]
       ),
       hash: Formatter.fcnCall(
-        'joined', 'Join.hashJoin', ['left', 'right', demo.hash, demo.join]
+        'return Join.hashJoin(', ['left', 'right', demo.hash, demo.join]
       )
     };
   }

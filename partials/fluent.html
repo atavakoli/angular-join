@@ -1,0 +1,81 @@
+<div class="container" ng-repeat="demo in demos">
+  <div class="row">
+    <h2>{{demo.name}}</h2>
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{active: demo.showing == 'table'}">
+        <a ng-click="demo.showing = 'table'">Results (Tables)</a>
+      </li>
+      <li role="presentation" ng-class="{active: demo.showing == 'json'}">
+        <a ng-click="demo.showing = 'json'">Results (JSON)</a>
+      </li>
+      <li role="presentation" ng-class="{active: demo.showing == 'code'}">
+        <a ng-click="demo.showing = 'code'">Code</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <a class="pull-right" ng-href="{{demo.sqlfiddleLink}}">
+        <span class="glyphicon glyphicon-link"></span>
+        SQL Fiddle
+      </a>
+    </div>
+  </div>
+
+  <div class="row" ng-if="demo.showing == 'table'">
+    <div class="col-md-3">
+      <h3>Left Array</h3>
+      <array-table data="demo.left" fields="demo.inFields"
+                   on-change="updateDemo(demo)">
+      </array-table>
+    </div>
+    <div class="col-md-3">
+      <h3>Right Array</h3>
+      <array-table data="demo.right" fields="demo.inFields"
+                   on-change="updateDemo(demo)">
+      </array-table>
+    </div>
+    <div class="col-md-6">
+      <h3 ng-repeat-start="step in demo.steps">
+        <code>{{step.title}}</code>
+      </h3>
+      <array-table ng-if="step.result.length" data="step.result" readonly>
+      </array-table>
+      <p class="text-muted" ng-repeat-end ng-if="!step.result.length">
+        <em>Empty</em>
+      </p>
+
+      <h3>Result</h3>
+      <array-table data="demo.result" fields="demo.outFields" readonly>
+      </array-table>
+    </div>
+  </div>
+
+  <div class="row" ng-if="demo.showing == 'json'">
+    <div class="col-md-3">
+      <h3>Left Array</h3>
+      <div hljs source="demo.left | json"></div>
+    </div>
+    <div class="col-md-3">
+      <h3>Right Array</h3>
+      <div hljs source="demo.right | json"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 ng-repeat-start="step in demo.steps">
+        <code>{{step.title}}</code>
+      </h3>
+      <div ng-repeat-end  hljs source="step.result | json"></div>
+
+      <h3>Result</h3>
+      <div hljs source="demo.result | json"></div>
+    </div>
+  </div>
+
+  <div class="row" ng-if="demo.showing == 'code'">
+    <div class="col-md-12">
+      <h3>Code</h3>
+      <div hljs source="demo.code"></div>
+    </div>
+  </div>
+</div>

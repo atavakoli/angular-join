@@ -1,0 +1,67 @@
+<div hljs language="sql">SELECT ...
+  LIMIT ... [OFFSET ...]
+</div>
+
+<p>
+  Returns a slice of the query results according the specified length and/or
+  offset.
+</p>
+<p>
+  The <code>.limit(length, offset)</code> function is equivalent to
+  <code>.slice(offset, offset + length)</code>, and <code>.offset(offset)</code>
+  is equivalent to <code>.slice(offset)</code>. The variants are provided as
+  syntactic sugar.
+</p>
+<p>
+   Calling <code>.limit(length, offset)</code> is equivalent to calling
+   <code>.offset(offset).limit(length)</code>.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .limit(length[, offset])
+
+
+query
+  .offset(offset)
+</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>length</code></td>
+      <td><span class="label label-primary">number</span></td>
+      <td>
+        <p>
+          The maximum length to which to limit the query result. If this is
+          longer than the length of the curren query result, then the result is
+          limited up to and including the last element.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>offset</code></td>
+      <td><span class="label label-primary">number</span></td>
+      <td>
+        <p><em>Optional for <code>.limit()</code></em></p>
+        <p>
+          The starting index (zero-based) of the returned query result, before
+          limiting to a specified length.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object whose results are a slice of the previous results.
+      </td>
+    </tr>
+  </tbody>
+</table>

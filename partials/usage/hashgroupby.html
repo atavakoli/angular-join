@@ -1,40 +1,57 @@
+<div hljs language="sql">SELECT ... /* AGGREGATE FUNCTIONS */
+  FROM ...
+  ...
+  GROUP BY ... /* THIS PART */
+</div>
+
 <p>
-  This function implements hash-based GROUP BY functionality on arrays; it is
-  similar to
-  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce">
+  Reduces query result elements that have the same hash into single elements.
+  Group membership is defined by the <code>hashFcn</code> function, where equal
+  elements (i.e. where <code>hashFcn(e1) === hashFcn(e2)</code>) belong to the
+  same group.
+</p>
+<p>
+  The result is similar to partitioning the query elements into sub-arrays of
+  elements that have the same hash (according to <code>hashFcn</code>), calling 
+  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce">
     Array.prototype.reduce()
   </a>,
-  except that the returned result is always an array and the
-  <code>previousValue</code> is the last value returned for the group that the
-  <code>currentValue</code> belongs to, according to <code>hashFcn</code>.
+  on each, and returning an array of each returned value.
 </p>
 
-<div hljs language="js">Join.hashGroupBy(input, hashFcn, callback)</div>
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .hashGroupBy(hashFcn, callback)
+</div>
 
-<h4>Arguments</h4>
+<h3>Arguments</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><code>input</code></td>
-      <td><span class="label label-warning">array</span></td>
-      <td>
-        The input array in the group-by operation.
-      </td>
-    </tr>
-    <tr>
       <td><code>hashFcn</code></td>
-      <td><span class="label label-success">function</span></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
       <td>
         <p>
           Function executed as <code>hashFcn(e)</code>, where <code>e</code> is
-          an element of <code>input</code>, and returning a number or string.
-          Values of <code>e</code> for which <code>hashFcn(e)</code> returns the
-          same value are considered to be in the same group with respect to
-          calls to the <code>callback</code> function.
+          an element of the current query result, and returning a number or
+          string. Values of <code>e</code> for which <code>hashFcn(e)</code>
+          returns the same value are considered to be in the same group.
         </p>
         <p>
-          Returning the same value for all inputs will result in a return value
-          equivalent to <code>[input.reduce(callback, null)]</code>.
+          If a string is passed in, then that property of each array element is
+          used as the hash. For example, passing in "x" is roughly equivalent
+          to passing in <code>function(e) { return e['x']; }</code>.
+        </p>
+        <p>
+          If an array of property names is passed in, then the JSON
+          representation of an array of those properties from each array
+          element is used as the hash. For example, passing in
+          <code>['x', 'y']</code> is equivalent to passing in
+          <code>function(e) { return JSON.stringify([e.x, e.y]); }</code>.
         </p>
       </td>
     </tr>
@@ -44,43 +61,31 @@
       <td>
         <p>
           Function executed as <code>callback(previousValue, e)</code>, where
-          <code>e</code> is an element of <code>input</code> and
+          <code>e</code> is an element of the current query result and
           <code>previousValue</code> is the last value returned by
           <code>callback</code> for the group to which <code>e</code> belongs.
-          If <code>e</code> is the first element in its group, then
+          On the first call for a particular group,
           <code>previousValue === null</code>. The last value returned for each
-          group is included in the array returned by <code>hashGroupBy</code>.
+          group is the one included for that group in the query result array.
         </p>
         <p>
           This function must always return a value.
-        </p>
-        <p>
-          Always returning <code>e</code>, or always returning
-          <code>previousValue</code> if it is not null, can be used to implement
-          DISTINCT functionality (i.e. only one element from <code>input</code> per
-          group is included in the final returned array).
         </p>
       </td>
     </tr>
   </tbody>
 </table>
 
-<h4>Returns</h4>
+<h3>Returns</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><span class="label label-warning">array</span></td>
+      <td><span class="label label-danger">query</span></td>
       <td>
         <p>
-          An array having one element per group (as defined by
+          A query object whose result has one element per group (as defined by
           <code>hashFcn</code>), where that element is the last value returned
           by <code>callback</code> for that group.
-        </p>
-        <p>
-          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">
-            Array.prototype.filter()
-          </a>
-          may be called on the returned array to implement HAVING functionality.
         </p>
       </td>
     </tr>

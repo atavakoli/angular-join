@@ -1,46 +1,69 @@
+<div hljs language="sql">SELECT ... /* AGGREGATE FUNCTIONS */
+  FROM ...
+  ...
+  GROUP BY ... /* THIS PART */
+</div>
+
 <p>
-  This function implements sort-based GROUP BY functionality on arrays; it is
-  similar to
-  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce">
+  Reduces query result elements that are equal into single elements. Group
+  membership is defined by the <code>comparator</code> function, where equal
+  elements (i.e. where <code>comparator(e1, e2) === 0</code>) belong to the
+  same group.
+</p>
+<p>
+  The result is similar to partitioning the query elements into sub-arrays of
+  elements that are equal (according to <code>comparator</code>), calling 
+  <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce">
     Array.prototype.reduce()
   </a>,
-  except that the returned result is always an array and the
-  <code>previousValue</code> is the last value returned for the group that the
-  <code>currentValue</code> belongs to, according to <code>comparator</code>.
-  It is slightly more efficient than <code>hashGroupBy</code> if the input
-  array is already sorted (see <code>options</code> below).
+  on each, and returning an array of each returned value.
 </p>
 
-<div hljs language="js">Join.sortGroupBy(input, comparator, callback, options)</div>
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .sortGroupBy(comparator, callback[, options])
+</div>
 
-<h4>Arguments</h4>
+<h3>Arguments</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><code>input</code></td>
-      <td><span class="label label-warning">array</span></td>
-      <td>
-        The input array in the group-by operation.
-      </td>
-    </tr>
-    <tr>
       <td><code>comparator</code></td>
-      <td><span class="label label-success">function</span></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
       <td>
         <p>
           Function executed as <code>comparator(e1, e2)</code>, where
-          <code>e1</code> and <code>e2</code> are elements of <code>input</code>,
-          and has the exact same spec as
+          <code>e1</code> and <code>e2</code> are elements of the current query
+          result. This function has the same spec as
           <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
             compareFunction in Array.prototype.sort()
           </a>.
           If <code>comparator(e1, e2) === 0</code>, then <code>e1</code>
-          and <code>e2</code> are considered to be part of the same group with
-          respect to calls to the <code>callback</code> function.
+          and <code>e2</code> are considered to be in the same group.
         </p>
         <p>
-          Returning <code>0</code> for all inputs will result in a return value
-          equivalent to <code>[input.reduce(callback, null)]</code>.
+          If a string is passed in, then the query elements are sorted by that
+          property in ascending order. If the property itself is a string, then
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">
+            String.prototype.localeCompare()
+          </a>
+          is used to sort the query results; if the property is an object with a
+          <code>diff()</code> function, then this function is expected to have
+          the same spec as the callback in
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            Array.prototype.sort()
+          </a>,
+          and it is used to sort the query results. Otherwise, the properties
+          are converted to numbers and used for sorting.
+        </p>
+        <p>
+          If an array of property names is passed in, then the query elements
+          are sorted in ascending order by each property in sequence, following
+          the same logic on each property as described above.
         </p>
       </td>
     </tr>
@@ -50,21 +73,15 @@
       <td>
         <p>
           Function executed as <code>callback(previousValue, e)</code>, where
-          <code>e</code> is an element of <code>input</code> and
+          <code>e</code> is an element of the current query result and
           <code>previousValue</code> is the last value returned by
           <code>callback</code> for the group to which <code>e</code> belongs.
-          If <code>e</code> is the first element in its group, then
+          On the first call for a particular group, then
           <code>previousValue === null</code>. The last value returned for each
-          group is included in the array returned by <code>sortGroupBy</code>.
+          group is the one included for that group in the query result array.
         </p>
         <p>
           This function must always return a value.
-        </p>
-        <p>
-          Always returning <code>e</code>, or always returning
-          <code>previousValue</code> if it is not null, can be used to implement
-          DISTINCT functionality (i.e. only one element from <code>input</code> per
-          group is included in the final returned array).
         </p>
       </td>
     </tr>
@@ -78,9 +95,9 @@
           <li>
             <code>sorted</code>
             <span class="label label-primary">boolean</span> :
-            If <code>true</code>, this signifies that <code>input</code> is
-            already sorted with respect to <code>comparator</code>. This
-            provides a slight performance boost. Default is <code>false</code>.
+            If <code>true</code>, this signifies that both input arrays are
+            already sorted according to <code>comparator</code>. This provides
+            a significant performance boost. Default is <code>false</code>.
           </li>
         </ul>
       </td>
@@ -88,22 +105,16 @@
   </tbody>
 </table>
 
-<h4>Returns</h4>
+<h3>Returns</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><span class="label label-warning">array</span></td>
+      <td><span class="label label-danger">query</span></td>
       <td>
         <p>
-          An array having one element per group (as defined by
+          A query object whose result has one element per group (as defined by
           <code>comparator</code>), where that element is the last value
           returned by <code>callback</code> for that group.
-        </p>
-        <p>
-          <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">
-            Array.prototype.filter()
-          </a>
-          may be called on the returned array to implement HAVING functionality.
         </p>
       </td>
     </tr>

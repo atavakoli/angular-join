@@ -1,0 +1,53 @@
+<div hljs language="sql">SELECT ... FROM ...
+  WHERE ...  /* THIS PART */
+  GROUP BY ...
+  HAVING ... /* AND/OR THIS PART */
+</div>
+
+<p>
+  Filter the query results to only include elements passing the test implemented
+  by <code>callback</code>.
+</p>
+<p>
+  The <code>.where</code>, <code>.having</code>, and <code>.filter</code>
+  functions are all equivalent and are provided as syntactic sugar to make
+  query construction more SQL-like; in particular, <code>.having</code> is
+  provided to be used after a <code>*GroupBy</code> operation.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .where(callback) // or .having|.filter(callback)</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>callback</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        <p>
+          Function executed as <code>callback(e)</code>, where <code>e</code>
+          is an element of the query array. The resulting query contains only
+          those elements for which a truthy value is returned, identically to
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">
+            Array.prototype.filter()
+          </a>.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object where only elements of the previous query's results
+        having <code>callback(e) == true</code> are included.
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,71 @@
+<div hljs language="sql">SELECT ...</div>
+
+<p>
+  Transforms each element in the query results with the return values of
+  <code>callback</code>.
+</p>
+<p>
+  The <code>.select</code> and <code>.map</code> functions are equivalent and
+  both are provided as syntactic sugar.
+</p>
+<p>
+  <code>Join.selectFrom(input).select(callback)</code> is equivalent to
+  <code>Join.selectFrom(input, callback)</code>.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .select(callback) // or .map(callback)</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>callback</code></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
+      <td>
+        <p>
+          Function executed as <code>callback(e)</code>, where <code>e</code>
+          is an element of the query array. This is used to transform the
+          elements (e.g. by selecting only a subset of their properties) before
+          other operations are chained to the query, and works identically to
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">
+            Array.prototype.map()
+          </a>.
+        </p>
+        <p>
+          If a string is passed in, then only that property of the query array
+          elements is included in the resulting array.
+        </p>
+        <p>
+          If an array of property names is passed in, then only those
+          properties of the query array elements are included in the resulting
+          array.
+        </p>
+        <p>
+          Unlike the SQL SELECT command, which operates on the final query
+          results, this function operates on the results <em>thus far</em>,
+          meaning if you want SQL-like behaviour, call <code>.select</code> as
+          the last operation in the query.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object where each element of the previous query's results have
+        been replaced by the values returned by <code>callback</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,23 +1,26 @@
+<div hljs language="sql">SELECT ...
+  FROM ...
+  [INNER|LEFT|RIGHT|FULL OUTER|CROSS] JOIN ... USING (...) /* THIS PART */
+</div>
+
 <p>
-  This function implements a version of the
+  Joins the query result to another array using a version of the
   <a href="//en.wikipedia.org/wiki/Hash_join">Hash Join</a> algorithm.
+</p>
+<p>
   It is appropriate when the source arrays are small and unsorted, and if
   the resulting array does not need to be returned in any particular order.
   For large sorted arrays, <code>mergeJoin</code> is much more efficient.
 </p>
 
-<div hljs language="js">Join.hashJoin(left, right, hashFcn, callback)</div>
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .hashJoin(right, hashFcn, callback)
+</div>
 
-<h4>Arguments</h4>
+<h3>Arguments</h3>
 <table class="table">
   <tbody>
-    <tr>
-      <td><code>left</code></td>
-      <td><span class="label label-warning">array</span></td>
-      <td>
-        The lefthand array in the join operation.
-      </td>
-    </tr>
     <tr>
       <td><code>right</code></td>
       <td><span class="label label-warning">array</span></td>
@@ -27,19 +30,35 @@
     </tr>
     <tr>
       <td><code>hashFcn</code></td>
-      <td><span class="label label-success">function</span></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
       <td>
         <p>
           Function executed as <code>hashFcn(e)</code>, where <code>e</code> is
-          an element of <code>left</code> or <code>right</code>, and returning
-          a number or string. Values of <code>e</code> for which
-          <code>hashFcn(e)</code> returns the same value are considered equal
-          and will be joined as specified by the <code>callback</code> function.
+          an element of the current query result (the "left" array) or
+          <code>right</code>, and returning a number or string. Values of
+          <code>e</code> for which <code>hashFcn(e)</code> returns the same
+          value are considered equal and will be joined as specified by the
+          <code>callback</code> function.
         </p>
         <p>
-          Returning the same value for all inputs can be used to implement
-          cross/cartesian joins (though a nested pair of for-loops may be
-          more efficient).
+          If a string is passed in, then that property of each array element is
+          used as the hash. For example, passing in "x" is roughly equivalent
+          to passing in <code>function(e) { return e['x']; }</code>.
+        </p>
+        <p>
+          If an array of property names is passed in, then the JSON
+          representation of an array of those properties from each array
+          element is used as the hash. For example, passing in
+          <code>['x', 'y']</code> is equivalent to passing in
+          <code>function(e) { return JSON.stringify([e.x, e.y]); }</code>.
+        </p>
+        <p>
+          Using the function version and returning the same value for all
+          inputs can be used to implement cross/cartesian joins.
         </p>
       </td>
     </tr>
@@ -49,10 +68,10 @@
       <td>
         <p>
           Function executed as <code>callback(e1, e2)</code>, where
-          <code>e1</code> and <code>e2</code> are elements of <code>left</code>
-          and <code>right</code>, respectively (or <code>null</code>; see
-          below). If the returned value is not falsy, it is added to the array
-          returned by <code>hashJoin</code>.
+          <code>e1</code> and <code>e2</code> are elements of the current query
+          result and <code>right</code>, respectively (or <code>null</code>; see
+          below). If the returned value is truthy, it is added to the query
+          result.
         </p>
         <p>
           For each pair of <code>e1</code> and <code>e2</code> where
@@ -78,15 +97,16 @@
   </tbody>
 </table>
 
-<h4>Returns</h4>
+<h3>Returns</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><span class="label label-warning">array</span></td>
+      <td><span class="label label-danger">query</span></td>
       <td>
-        The join of <code>left</code> and <code>right</code>: for each call to
-        <code>callback(left[m], right[n])</code> returning a non-falsey value,
-        that element is added to the returned array.
+        A query object whose result is the join of the previous query result
+        (the "left" array) and <code>right</code>: for each call to
+        <code>callback(left[m], right[n])</code> returning a truthy value, that
+        element is added to the query result.
       </td>
     </tr>
   </tbody>

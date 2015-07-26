@@ -27,6 +27,12 @@ angular.module('angularJoinDemo')
       title: 'Group By Demo',
       templateUrl: 'partials/groupby.html',
       controller: 'GroupByDemoCtrl'
+    },
+    {
+      path: '/fluent',
+      title: 'Fluent API Demo',
+      templateUrl: 'partials/fluent.html',
+      controller: 'FluentDemoCtrl'
     }
   ]
 );

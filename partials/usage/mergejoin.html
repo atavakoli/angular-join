@@ -1,22 +1,25 @@
+<div hljs language="sql">SELECT ...
+  FROM ...
+  [INNER|LEFT|RIGHT|FULL OUTER|CROSS] JOIN ... USING (...) /* THIS PART */
+</div>
+
 <p>
-  This function implements a version of the
+  Joins the query result to another array using a version of the
   <a href="//en.wikipedia.org/wiki/Sort-merge_join">Sort-Merge Join</a> algorithm.
+</p>
+<p>
   It is much more efficient than <code>hashJoin</code> when the source arrays
   already sorted (see <code>options.sorted</code> below).
 </p>
 
-<div hljs language="js">Join.mergeJoin(left, right, comparator, callback[, options])</div>
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .mergeJoin(right, comparator, callback[, options])
+</div>
 
-<h4>Arguments</h4>
+<h3>Arguments</h3>
 <table class="table">
   <tbody>
-    <tr>
-      <td><code>left</code></td>
-      <td><span class="label label-warning">array</span></td>
-      <td>
-        The lefthand array in the join operation.
-      </td>
-    </tr>
     <tr>
       <td><code>right</code></td>
       <td><span class="label label-warning">array</span></td>
@@ -26,12 +29,17 @@
     </tr>
     <tr>
       <td><code>comparator</code></td>
-      <td><span class="label label-success">function</span></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
       <td>
         <p>
           Function executed as <code>comparator(e1, e2)</code>, where
-          <code>e1</code> and <code>e2</code> are elements of <code>left</code>
-          and <code>right</code>, respectively, and has the exact same spec as
+          <code>e1</code> and <code>e2</code> are elements of the current query
+          result (the "left" array) and <code>right</code>, respectively, and
+          has the same spec as
           <a href="//developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
             compareFunction in Array.prototype.sort()
           </a>.
@@ -41,8 +49,27 @@
         </p>
         <p>
           Returning <code>0</code> for all inputs can be used to implement
-          cross/cartesian joins (though a nested pair of for-loops may be
-          more efficient).
+          cross/cartesian joins.
+        </p>
+        <p>
+          If a string is passed in, then the query elements are sorted by that
+          property in ascending order. If the property itself is a string, then
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">
+            String.prototype.localeCompare()
+          </a>
+          is used to sort the query results; if the property is an object with a
+          <code>diff()</code> function, then this function is expected to have
+          the same spec as the callback in
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            Array.prototype.sort()
+          </a>,
+          and it is used to sort the query results. Otherwise, the properties
+          are converted to numbers and used for sorting.
+        </p>
+        <p>
+          If an array of property names is passed in, then the query elements
+          are sorted in ascending order by each property in sequence, following
+          the same logic on each property as described above.
         </p>
       </td>
     </tr>
@@ -52,17 +79,16 @@
       <td>
         <p>
           Function executed as <code>callback(e1, e2)</code>, where
-          <code>e1</code> and <code>e2</code> are elements of <code>left</code>
-          and <code>right</code>, respectively (or <code>null</code>; see
-          below). If the returned value is not falsy, it is added to the array
-          returned by <code>mergeJoin</code>.
+          <code>e1</code> and <code>e2</code> are elements of the current query
+          result (the "left" array) and <code>right</code>, respectively (or
+          <code>null</code>; see below). If the returned value is truthy, it is
+          added to the query result.
         </p>
         <p>
-          For each pair of <code>e1</code> and <code>e2</code> where
-          <code>comparator(e1, e2) === 0</code>, <code>callback(e1, e2)</code>
-          is called once per pair. Returning a value only when neither
-          <code>e1</code> or <code>e2</code> are null can be used to implement
-          inner joins.
+          For each equivalent pair of <code>e1</code> and <code>e2</code>,
+          <code>callback(e1, e2)</code> is called once per pair. Returning a
+          value only when neither <code>e1</code> or <code>e2</code> are null
+          can be used to implement inner joins.
         </p>
         <p>
           For each <code>e1</code> where there is no matching <code>e2</code>,
@@ -98,15 +124,16 @@
   </tbody>
 </table>
 
-<h4>Returns</h4>
+<h3>Returns</h3>
 <table class="table">
   <tbody>
     <tr>
-      <td><span class="label label-warning">array</span></td>
+      <td><span class="label label-danger">query</span></td>
       <td>
-        The join of <code>left</code> and <code>right</code>: for each call to
-        <code>callback(left[m], right[n])</code> returning a non-falsey value,
-        that element is added to the returned array.
+        A query object whose result is the join of the previous query result
+        (the "left" array) and <code>right</code>: for each call to
+        <code>callback(left[m], right[n])</code> returning a truthy value,
+        that element is added to the query result.
       </td>
     </tr>
   </tbody>

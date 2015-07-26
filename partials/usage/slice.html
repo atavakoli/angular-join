@@ -1,0 +1,64 @@
+<div hljs language="sql">SELECT ...
+  LIMIT ... [OFFSET ...]
+</div>
+
+<p>
+  Returns a slice of the query results according the specified begin and end.
+</p>
+<p>
+  This function follows the same spec as
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice">
+    Array.prototype.slice()
+  </a>.
+</p>
+<p>
+  The <code>.slice(begin, end)</code> function is equivalent to
+  <code>.limit(begin, end - begin)</code>, and <code>.slice(begin)</code>
+  is equivalent to <code>.offset(begin)</code>. The variants are provided as
+  syntactic sugar.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .slice([begin[, end]])
+</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>begin</code></td>
+      <td><span class="label label-primary">number</span></td>
+      <td>
+        <p><em>Optional</em></p>
+        <p>
+          The index (zero-based) of the query result at which to begin
+          extraction. Default is 0.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>end</code></td>
+      <td><span class="label label-primary">number</span></td>
+      <td>
+        <p><em>Optional</em></p>
+        <p>
+          The index (zero-based) of the query result before which to end
+          extraction. Default is the end of the current query result.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object whose results are a slice of the previous results.
+      </td>
+    </tr>
+  </tbody>
+</table>

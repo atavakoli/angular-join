@@ -1,0 +1,78 @@
+<div hljs language="sql">SELECT ...
+  ORDER BY ...
+</div>
+
+<p>
+  Sort the query results according to <code>comparator</code>.
+</p>
+<p>
+  The <code>.orderBy</code> and <code>.sort</code> functions are equivalent and
+  both are provided as syntactic sugar.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  .orderBy(comparator) // or .sort(comparator)</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>comparator</code></td>
+      <td>
+        <p><span class="label label-success">function</span></p>
+        <p><span class="label label-primary">string</span></p>
+        <p><span class="label label-warning">array</span></p>
+      </td>
+      <td>
+        <p>
+          Function executed as <code>comaprator(e1, e2)</code>, where
+          <code>e1</code> and <code>e2</code> are elements of the query array.
+          The resulting query's results are sorted according to the returned
+          values.
+        </p>
+        <p>
+          This function follows the same spec as
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            Array.prototype.sort()
+          </a>,
+          except that instead of sorting in-place, a new array will be created
+          (as is the case with every query operation).
+        </p>
+        <p>
+          If a string is passed in, then the query elements are sorted by that
+          property in ascending order. If the property itself is a string, then
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">
+            String.prototype.localeCompare()
+          </a>
+          is used to sort the query results; if the property is an object with a
+          <code>diff()</code> function, then this function is expected to have
+          the same spec as the callback in
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort">
+            Array.prototype.sort()
+          </a>,
+          and it is used to sort the query results. Otherwise, the properties
+          are converted to numbers and used for sorting.
+        </p>
+        <p>
+          If an array of property names is passed in, then the query elements
+          are sorted in ascending order by each property in sequence, following
+          the same logic on each property as described above.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object whose elements are sorted according to
+        <code>comparator(e1, e2)</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>

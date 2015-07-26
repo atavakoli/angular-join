@@ -1,0 +1,64 @@
+<p>
+  <strong>Note: This function has is no analogue in SQL.</strong>
+</p>
+
+<p>
+  Inspect the current query result using the provided callback.
+</p>
+<p>
+  This may be inserted in the middle of query construction to inspect or extract
+  the array at that point in execution. The provided <code>callback</code>
+  function will be called with the result array as its only argument. This is
+  similar to using the notify callback when calling
+  <code>.execute({async: true})</code>, except that (unlike the notify
+  callback) different <code>.inspect()</code> callbacks may be inserted at
+  different points in the query execution.
+</p>
+<p>
+  The main difference between this function and <code>.execute()</code> is that
+  instead of an array or a promise, this function returns the query object,
+  allowing you to continue constructing your query. Also, like other operations,
+  the callback is not executed until <code>.execute()</code> is called.
+</p>
+<p>
+  The two main use-cases for this function are debugging and efficiency. For
+  example, the intermediate results in the <a href="#fluent">Fluent Demo</a>
+  were constructed using <code>.inspect()</code> inserted at various points
+  within the construction of a single query. This is more efficient and less
+  code than construcing/executing multiple queries for each step.
+</p>
+
+<h3>Syntax</h3>
+<div hljs language="js">query
+  // operations
+  .inspect(callback)
+  // more operations
+</div>
+
+<h3>Arguments</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><code>callback</code></td>
+      <td><span class="label label-success">function</span></td>
+      <td>
+        Function executed as <code>callback(arr)</code>, where <code>arr</code>
+        is the query result array (i.e. the array constructed by earlier
+        operations in this query, and used as input to subsequent operations).
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Returns</h3>
+<table class="table">
+  <tbody>
+    <tr>
+      <td><span class="label label-danger">query</span></td>
+      <td>
+        A query object whose results are the same as those passed into
+        <code>callback</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
