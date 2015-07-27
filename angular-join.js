@@ -59,25 +59,28 @@ angular.module('angular-join', [])
     }
 
     var i1 = 0, i2 = 0;
-    var len1 = getContiguousLength(a1, i1);
-    var len2 = getContiguousLength(a2, i2);
 
-    while (i1 < a1.length && i2 < a2.length) {
-      var compare = comparator(a1[i1], a2[i2]);
-      if (compare === 0) {
-        addCartesianJoin(i1, i1 + len1, i2, i2 + len2);
-        i1 += len1;
-        i2 += len2;
-        len1 = getContiguousLength(a1, i1);
-        len2 = getContiguousLength(a2, i2);
-      } else if (compare < 0) {
-        addLeft(i1, i1 + len1);
-        i1 += len1;
-        len1 = getContiguousLength(a1, i1);
-      } else {
-        addRight(i2, i2 + len2);
-        i2 += len2;
-        len2 = getContiguousLength(a2, i2);
+    if (a1.length && a2.length) {
+      var len1 = getContiguousLength(a1, i1);
+      var len2 = getContiguousLength(a2, i2);
+
+      while (i1 < a1.length && i2 < a2.length) {
+        var compare = comparator(a1[i1], a2[i2]);
+        if (compare === 0) {
+          addCartesianJoin(i1, i1 + len1, i2, i2 + len2);
+          i1 += len1;
+          i2 += len2;
+          len1 = getContiguousLength(a1, i1);
+          len2 = getContiguousLength(a2, i2);
+        } else if (compare < 0) {
+          addLeft(i1, i1 + len1);
+          i1 += len1;
+          len1 = getContiguousLength(a1, i1);
+        } else {
+          addRight(i2, i2 + len2);
+          i2 += len2;
+          len2 = getContiguousLength(a2, i2);
+        }
       }
     }
 
@@ -110,6 +113,18 @@ angular.module('angular-join', [])
           a3.push(newElement);
         }
       };
+    }
+
+    if (hashed.length === 0) {
+      scanned.forEach(function(e) {
+        addCallback(null, e);
+      });
+      return a3;
+    } else if (scanned.length === 0) {
+      hashed.forEach(function(e) {
+        addCallback(e, null);
+      });
+      return a3;
     }
     
     var hashTable = {};
@@ -158,6 +173,10 @@ angular.module('angular-join', [])
   function sortGroupBy(a, comparator, callback, options) {
     var results = [];
 
+    if (a.length === 0) {
+      return results;
+    }
+
     if (!options || !options.sorted) {
       a = a.slice().sort(comparator);
     }
@@ -178,6 +197,10 @@ angular.module('angular-join', [])
   }
 
   function hashGroupBy(a, hashFcn, callback) {
+    if (a.length === 0) {
+      return [];
+    }
+
     var hashTable = {};
 
     for (var i = 0; i < a.length; ++i) {
