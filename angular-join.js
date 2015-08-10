@@ -9,7 +9,8 @@ angular.module('angular-join', [])
    * JOIN *
    ********/
 
-  function mergeJoin(a1, a2, comparator, callback, options) {
+  function mergeJoin(a2, comparator, callback, options) {
+    var a1 = this;
     var a3 = [];
   
     if (!options || !options.sorted) {
@@ -90,7 +91,8 @@ angular.module('angular-join', [])
     return a3;
   }
   
-  function hashJoin(a1, a2, hashFcn, callback) {
+  function hashJoin(a2, hashFcn, callback) {
+    var a1 = this;
     var a3 = [];
     var addCallback;
     
@@ -170,7 +172,8 @@ angular.module('angular-join', [])
    * GROUP BY *
    ************/
 
-  function sortGroupBy(a, comparator, callback, options) {
+  function sortGroupBy(comparator, callback, options) {
+    var a = this;
     var results = [];
 
     if (a.length === 0) {
@@ -196,7 +199,8 @@ angular.module('angular-join', [])
     return results;
   }
 
-  function hashGroupBy(a, hashFcn, callback) {
+  function hashGroupBy(hashFcn, callback) {
+    var a = this;
     if (a.length === 0) {
       return [];
     }
@@ -219,34 +223,24 @@ angular.module('angular-join', [])
    * FLUENT INTERFACE *
    ********************/
 
-  function selectFrom(a1, selectCallback) {
-    function callWithThis(fcn) {
-      return function() {
-        var args = [this];
-        for (var i = 0; i < arguments.length; i++) {
-          args.push(arguments[i]);
-        }
-        return fcn.apply(this, args);
-      };
-    }
-
+  function selectFrom(input, selectCallback) {
     var query = {
-      a: a1,
+      a: input,
       ops: [],
       mergeJoin: function(a2, comparator, callback) {
-        this.ops.push([callWithThis(mergeJoin), a2, comparator, callback]);
+        this.ops.push([mergeJoin, a2, comparator, callback]);
         return this;
       },
       hashJoin: function(a2, hashFcn, callback) {
-        this.ops.push([callWithThis(hashJoin), a2, hashFcn, callback]);
+        this.ops.push([hashJoin, a2, hashFcn, callback]);
         return this;
       },
       sortGroupBy: function(comparator, callback) {
-        this.ops.push([callWithThis(sortGroupBy), comparator, callback]);
+        this.ops.push([sortGroupBy, comparator, callback]);
         return this;
       },
       hashGroupBy: function(hashFcn, callback) {
-        this.ops.push([callWithThis(hashGroupBy), hashFcn, callback]);
+        this.ops.push([hashGroupBy, hashFcn, callback]);
         return this;
       },
       map: function(callback) {
@@ -328,13 +322,30 @@ angular.module('angular-join', [])
     return query;
   }
 
-  return {
-    selectFrom: selectFrom,
-    mergeJoin: mergeJoin,
-    hashJoin: hashJoin,
-    sortGroupBy: sortGroupBy,
-    hashGroupBy: hashGroupBy
-  };
+  function queryWrapper(fcnName) {
+    // takes the 1st argument and uses it as 'this'
+    return function() {
+      var args = [];
+      for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
+
+      var query = selectFrom(arguments[0]);
+      return query[fcnName].apply(query, args).execute();
+    };
+  }
+
+  var service = { selectFrom: selectFrom };
+
+  // Add all the functions in a query (except visit & execute) to the service
+  //  so that they can be called statically
+  angular.forEach(selectFrom([]), function(prop, key) {
+    if (['visit', 'execute'].indexOf(key) < 0 && typeof prop == 'function') {
+      service[key] = queryWrapper(key);
+    }
+  });
+
+  return service;
 });
 
 }());
