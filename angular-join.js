@@ -5,6 +5,83 @@ angular.module('angular-join', [])
 
 .factory('Join', function() {
 
+  /***************
+   * NORMALIZERS *
+   ***************/
+
+  function normalizeHashFcn(hashFcn) {
+    if (typeof hashFcn == 'string' || hashFcn instanceof String) {
+      if (hashFcn instanceof String) {
+        hashFcn = hashFcn.valueOf();
+      }
+      return function(e) {
+        return e[hashFcn];
+      }
+    } else if (typeof hashFcn == 'object' && Array.isArray(hashFcn)) {
+      return function(e) {
+        return JSON.stringify(hashFcn.map(function(prop) {
+          return e[prop];
+        }));
+      }
+    } else {
+      return hashFcn;
+    }
+  }
+
+  function normalizeComparator(comparator) {
+    if (typeof comparator == 'string' || comparator instanceof String) {
+      if (comparator instanceof String) {
+        comparator = comparator.valueOf();
+      }
+      return function(e1, e2) {
+        if (typeof e1[comparator].localeCompare == 'function') {
+          return e1[comparator].localeCompare(e2[comparator]);
+        } else if (typeof e1[comparator].diff == 'function') {
+          return e1[comparator].diff(e2[comparator]);
+        } else {
+          return +e1[comparator] - +e2[comparator];
+        }
+      }
+    } else if (typeof comparator == 'object' && Array.isArray(comparator)) {
+      return function(e1, e2) {
+        var result = 0;
+        comparator.some(function(prop) {
+          if (typeof e1[prop].localeCompare == 'function') {
+            result = e1[prop].localeCompare(e2[prop]);
+          } else if (typeof e1[prop].diff == 'function') {
+            result = e1[prop].diff(e2[prop]);
+          } else {
+            result = +e1[prop] - +e2[prop];
+          }
+
+          return (result !== 0);
+        });
+        return result;
+      }
+    } else {
+      return comparator;
+    }
+  }
+
+  function normalizeSelect(callback) {
+    if (typeof callback == 'string' || callback instanceof String) {
+      return function(e) {
+        var result = {};
+        result[callback] = e[callback];
+        return result;
+      }
+    } else if (typeof callback == 'object' && callback.isArray()) {
+      return function(e) {
+        return callback.reduce(function(prev, prop) {
+          prev[prop] = e[prop];
+          return prev;
+        }, {});
+      }
+    } else {
+      return callback;
+    }
+  }
+
   /********
    * JOIN *
    ********/
@@ -12,6 +89,8 @@ angular.module('angular-join', [])
   function mergeJoin(a2, comparator, callback, options) {
     var a1 = this;
     var a3 = [];
+
+    comparator = normalizeComparator(comparator);
   
     if (!options || !options.sorted) {
       a1 = a1.slice().sort(comparator);
@@ -95,7 +174,9 @@ angular.module('angular-join', [])
     var a1 = this;
     var a3 = [];
     var addCallback;
-    
+
+    hashFcn = normalizeHashFcn(hashFcn);
+
     var hashed, scanned;
     if (a1.length < a2.length) {
       hashed = a1;
@@ -180,6 +261,8 @@ angular.module('angular-join', [])
       return results;
     }
 
+    comparator = normalizeComparator(comparator);
+
     if (!options || !options.sorted) {
       a = a.slice().sort(comparator);
     }
@@ -204,6 +287,8 @@ angular.module('angular-join', [])
     if (a.length === 0) {
       return [];
     }
+
+    hashFcn = normalizeHashFcn(hashFcn);
 
     var hashTable = {};
 
@@ -244,7 +329,7 @@ angular.module('angular-join', [])
         return this;
       },
       map: function(callback) {
-        this.ops.push([Array.prototype.map, callback]);
+        this.ops.push([Array.prototype.map, normalizeSelect(callback)]);
         return this;
       },
       select: function(callback) {
@@ -263,15 +348,15 @@ angular.module('angular-join', [])
         // just an alias for filter
         return this.filter(callback);
       },
-      sort: function(callback) {
-        this.ops.push([function sortCopy(callback) {
-          return this.slice().sort(callback);
-        }, callback]);
+      sort: function(comparator) {
+        this.ops.push([function sortCopy(comparator) {
+          return this.slice().sort(comparator);
+        }, normalizeComparator(comparator)]);
         return this;
       },
-      orderBy: function(callback) {
+      orderBy: function(comparator) {
         // just an alias for sort
-        return this.sort(callback);
+        return this.sort(comparator);
       },
       slice: function(begin, end) {
         this.ops.push([Array.prototype.slice, begin || 0, end]);
@@ -316,7 +401,7 @@ angular.module('angular-join', [])
     };
 
     if (typeof selectCallback == 'function') {
-      query = query.select(selectCallback);
+      query = query.select(normalizeSelect(selectCallback));
     }
 
     return query;
