@@ -91,7 +91,7 @@ angular.module('angular-join', [])
     var a3 = [];
 
     comparator = normalizeComparator(comparator);
-  
+
     if (!options || !options.sorted) {
       a1 = a1.slice().sort(comparator);
       a2 = a2.slice().sort(comparator);
@@ -169,7 +169,7 @@ angular.module('angular-join', [])
 
     return a3;
   }
-  
+
   function hashJoin(a2, hashFcn, callback) {
     var a1 = this;
     var a3 = [];
@@ -209,7 +209,7 @@ angular.module('angular-join', [])
       });
       return a3;
     }
-    
+
     var hashTable = {};
     var hash, hashBucket;
 
@@ -223,7 +223,7 @@ angular.module('angular-join', [])
         hashTable[hash] = [{ used: false, e: hashedEntry }];
       }
     }
-    
+
     for (i = 0; i < scanned.length; i++) {
       var scannedEntry = scanned[i];
       hash = hashFcn(scannedEntry, i, scanned);
@@ -237,7 +237,7 @@ angular.module('angular-join', [])
         addCallback(null, scannedEntry);
       }
     }
-    
+
     Object.keys(hashTable).forEach(function(hash) {
       hashTable[hash].forEach(function(hashedEntry) {
         if (!hashedEntry.used) {
@@ -370,8 +370,8 @@ angular.module('angular-join', [])
         // just syntactic sugar for slice with 1 parameter
         return this.slice(offset || 0);
       },
-      visit: function(visitor) {
-        this.ops.push([function() { visitor(this); return this; }]);
+      inspect: function(callback) {
+        this.ops.push([function() { callback(this); return this; }]);
         return this;
       },
       execute: function(options) {
@@ -422,10 +422,10 @@ angular.module('angular-join', [])
 
   var service = { selectFrom: selectFrom };
 
-  // Add all the functions in a query (except visit & execute) to the service
+  // Add all the functions in a query (except inspect & execute) to the service
   //  so that they can be called statically
   angular.forEach(selectFrom([]), function(prop, key) {
-    if (['visit', 'execute'].indexOf(key) < 0 && typeof prop == 'function') {
+    if (['inspect', 'execute'].indexOf(key) < 0 && typeof prop == 'function') {
       service[key] = queryWrapper(key);
     }
   });
