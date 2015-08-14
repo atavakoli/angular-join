@@ -1,8 +1,11 @@
-angular-join [![Build Status](https://travis-ci.org/atavakoli/angular-join.svg)](https://travis-ci.org/atavakoli/angular-join)
+angular-join
 ============
 
-An AngularJS service providing RDBMS `JOIN` & `GROUP BY` functionality for
-JavaScript arrays.
+[![Build Status][travis-img]][travis]
+[![Bower][bower-img]][bower]
+[![License][license-img]](LICENSE)
+
+An AngularJS service providing RDBMS functionality for JavaScript arrays.
 
 [Demo/Documentation][docs]
 
@@ -727,3 +730,11 @@ resulting array, as can be done on query objects with `.execute({async:true})`.
 [Array.prototype.sort()]: http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
 [Array.prototype.reduce()]: http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
 [Array.prototype.filter()]: http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+
+[travis-img]: https://travis-ci.org/atavakoli/angular-join.svg
+[travis]: https://travis-ci.org/atavakoli/angular-join
+
+[bower-img]: http://img.shields.io/bower/v/angular-join.svg
+[bower]: http://bower.io/search/?q=angular-join
+
+[license-img]: https://img.shields.io/badge/license-MIT-blue.svg
