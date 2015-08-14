@@ -1,4 +1,4 @@
-angular-join
+angular-join [![Build Status](https://travis-ci.org/atavakoli/angular-join.svg)](https://travis-ci.org/atavakoli/angular-join)
 ============
 
 An AngularJS service providing RDBMS `JOIN` & `GROUP BY` functionality for
