@@ -1,4 +1,4 @@
-describe('join', function() {
+describe('joining two arrays', function() {
   var Join;
 
   beforeEach(module('angular-join'));
@@ -14,10 +14,10 @@ describe('join', function() {
   ];
 
   var right = [
-    { x: 1, y: 5 },
-    { x: 2, y: 6 },
-    { x: 3, y: 7 },
-    { x: 5, y: 8 }
+    { x: 1, y: 1, z: 5 },
+    { x: 2, y: 2, z: 6 },
+    { x: 3, y: 3, z: 7 },
+    { x: 5, y: 5, z: 8 }
   ];
 
   function hashFcn(e) {
@@ -30,113 +30,154 @@ describe('join', function() {
 
   var tests = [
     {
-      name: 'inner',
+      name: 'inner join',
       left: left, right: right,
-      hash: hashFcn, comparator: comparator, field: 'x',
+      hash: hashFcn, comparator: comparator,
+      field: 'x', fields: ['x', 'y'],
       join: function(e1, e2) {
         if (e1 && e2) {
           return {
-            x:  e1.x,
-            y1: e1.y,
-            y2: e2.y
+            x: e1.x,
+            y: e1.y,
+            z: e2.z
           };
         } else {
           return null;
         }
       },
       expected: [
-        { x: 1, y1: 1, y2: 5 },
-        { x: 2, y1: 2, y2: 6 },
-        { x: 3, y1: 3, y2: 7 }
+        { x: 1, y: 1, z: 5 },
+        { x: 2, y: 2, z: 6 },
+        { x: 3, y: 3, z: 7 }
       ]
     },
     {
-      name: 'left',
+      name: 'left outer join',
       left: left, right: right,
-      hash: hashFcn, comparator: comparator, field: 'x',
+      hash: hashFcn, comparator: comparator,
+      field: 'x', fields: ['x', 'y'],
       join: function(e1, e2) {
         if (e1 && e2) {
           return {
-            x:  e1.x,
-            y1: e1.y,
-            y2: e2.y
+            x: e1.x,
+            y: e1.y,
+            z: e2.z
           };
         } else if (e1) {
           return {
             x: e1.x,
-            y1: e1.y,
-            y2: null
+            y: e1.y,
+            z: null
           };
         } else {
           return null;
         }
       },
       expected: [
-        { x: 1, y1: 1, y2: 5 },
-        { x: 2, y1: 2, y2: 6 },
-        { x: 3, y1: 3, y2: 7 },
-        { x: 4, y1: 4, y2: null }
+        { x: 1, y: 1, z: 5 },
+        { x: 2, y: 2, z: 6 },
+        { x: 3, y: 3, z: 7 },
+        { x: 4, y: 4, z: null }
       ]
     },
     {
-      name: 'right',
+      name: 'right outer join',
       left: left, right: right,
-      hash: hashFcn, comparator: comparator, field: 'x',
+      hash: hashFcn, comparator: comparator,
+      field: 'x', fields: ['x', 'y'],
       join: function(e1, e2) {
         if (e1 && e2) {
           return {
-            x:  e1.x,
-            y1: e1.y,
-            y2: e2.y
+            x: e1.x,
+            y: e1.y,
+            z: e2.z
           };
         } else if (e2) {
           return {
             x: e2.x,
-            y1: null,
-            y2: e2.y
+            y: null,
+            z: e2.z
           };
         } else {
           return null;
         }
       },
       expected: [
-        { x: 1, y1: 1,    y2: 5 },
-        { x: 2, y1: 2,    y2: 6 },
-        { x: 3, y1: 3,    y2: 7 },
-        { x: 5, y1: null, y2: 8 }
+        { x: 1, y: 1,    z: 5 },
+        { x: 2, y: 2,    z: 6 },
+        { x: 3, y: 3,    z: 7 },
+        { x: 5, y: null, z: 8 }
       ]
     },
     {
-      name: 'full',
+      name: 'full outer join',
       left: left, right: right,
-      hash: hashFcn, comparator: comparator, field: 'x',
+      hash: hashFcn, comparator: comparator,
+      field: 'x', fields: ['x', 'y'],
       join: function(e1, e2) {
         if (e1 && e2) {
           return {
-            x:  e1.x,
-            y1: e1.y,
-            y2: e2.y
+            x: e1.x,
+            y: e1.y,
+            z: e2.z
           };
         } else if (e1) {
           return {
             x: e1.x,
-            y1: e1.y,
-            y2: null
+            y: e1.y,
+            z: null
           };
         } else {
           return {
             x: e2.x,
-            y1: null,
-            y2: e2.y
+            y: null,
+            z: e2.z
           };
         }
       },
       expected: [
-        { x: 1, y1: 1,    y2: 5 },
-        { x: 2, y1: 2,    y2: 6 },
-        { x: 3, y1: 3,    y2: 7 },
-        { x: 4, y1: 4,    y2: null },
-        { x: 5, y1: null, y2: 8 }
+        { x: 1, y: 1,    z: 5 },
+        { x: 2, y: 2,    z: 6 },
+        { x: 3, y: 3,    z: 7 },
+        { x: 4, y: 4,    z: null },
+        { x: 5, y: null, z: 8 }
+      ]
+    },
+    {
+      name: 'cross join',
+      left: left, right: right,
+      hash: function(e) { return 1; },
+      comparator: function(e1, e2) { return 0; },
+      join: function(e1, e2) {
+        if (e1 && e2) {
+          return {
+            x1: e1.x,
+            x2: e2.x,
+            y1: e1.y,
+            y2: e2.y,
+            z: e2.z
+          };
+        } else {
+          return null;
+        }
+      },
+      expected: [
+        { x1: 1, x2: 1, y1: 1, y2: 1, z: 5 },
+        { x1: 1, x2: 2, y1: 1, y2: 2, z: 6 },
+        { x1: 1, x2: 3, y1: 1, y2: 3, z: 7 },
+        { x1: 1, x2: 5, y1: 1, y2: 5, z: 8 },
+        { x1: 2, x2: 1, y1: 2, y2: 1, z: 5 },
+        { x1: 2, x2: 2, y1: 2, y2: 2, z: 6 },
+        { x1: 2, x2: 3, y1: 2, y2: 3, z: 7 },
+        { x1: 2, x2: 5, y1: 2, y2: 5, z: 8 },
+        { x1: 3, x2: 1, y1: 3, y2: 1, z: 5 },
+        { x1: 3, x2: 2, y1: 3, y2: 2, z: 6 },
+        { x1: 3, x2: 3, y1: 3, y2: 3, z: 7 },
+        { x1: 3, x2: 5, y1: 3, y2: 5, z: 8 },
+        { x1: 4, x2: 1, y1: 4, y2: 1, z: 5 },
+        { x1: 4, x2: 2, y1: 4, y2: 2, z: 6 },
+        { x1: 4, x2: 3, y1: 4, y2: 3, z: 7 },
+        { x1: 4, x2: 5, y1: 4, y2: 5, z: 8 }
       ]
     }
 
@@ -167,57 +208,65 @@ describe('join', function() {
 
     describe('called statically', function() {
       tests.forEach(function(t) {
-        describe('should do ' + t.name + '-join', function() {
-          it('with a function', function() {
-            var result = Join.hashJoin(t.left, t.right, t.hash, t.join);
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+        describe('should do ' + t.name, function() {
+          if (t.hasOwnProperty('hash')) {
+            it('with a function', function() {
+              var result = Join.hashJoin(t.left, t.right, t.hash, t.join);
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
 
-          it('with a string', function() {
-            var result = Join.hashJoin(t.left, t.right, t.field, t.join);
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+          if (t.hasOwnProperty('field')) {
+            it('with a string', function() {
+              var result = Join.hashJoin(t.left, t.right, t.field, t.join);
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
 
-          it('with an array', function() {
-            var result = Join.hashJoin(t.left, t.right, [t.field], t.join);
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+          if (t.hasOwnProperty('fields')) {
+            it('with an array', function() {
+              var result = Join.hashJoin(t.left, t.right, t.fields, t.join);
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
         });
       });
-
-      it('should do cross join');
     });
 
     describe('called fluently', function() {
       tests.forEach(function(t) {
-        describe('should do ' + t.name + '-join', function() {
-          it('with a function', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .hashJoin(t.right, t.hash, t.join)
-              .execute();
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+        describe('should do ' + t.name, function() {
+          if (t.hasOwnProperty('hash')) {
+            it('with a function', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(t.right, t.hash, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
 
-          it('with a string', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .hashJoin(t.right, t.field, t.join)
-              .execute();
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+          if (t.hasOwnProperty('field')) {
+            it('with a string', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(t.right, t.field, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
 
-          it('with an array', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .hashJoin(t.right, [t.field], t.join)
-              .execute();
-            expect(result).toEqual(permutationOf(t.expected));
-          });
+          if (t.hasOwnProperty('fields')) {
+            it('with an array', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(t.right, t.fields, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
         });
       });
-
-      it('should do cross join');
     });
 
   });
@@ -225,57 +274,65 @@ describe('join', function() {
   describe('using a merge-join algorithm', function() {
     describe('called statically', function() {
       tests.forEach(function(t) {
-        describe('should do ' + t.name + '-join', function() {
-          it('with a function', function() {
-            var result = Join.mergeJoin(t.left, t.right, t.comparator, t.join);
-            expect(result).toEqual(t.expected);
-          });
+        describe('should do ' + t.name, function() {
+          if (t.hasOwnProperty('comparator')) {
+            it('with a function', function() {
+              var result = Join.mergeJoin(t.left, t.right, t.comparator, t.join);
+              expect(result).toEqual(t.expected);
+            });
+          }
 
-          it('with a string', function() {
-            var result = Join.mergeJoin(t.left, t.right, t.field, t.join);
-            expect(result).toEqual(t.expected);
-          });
+          if (t.hasOwnProperty('field')) {
+            it('with a string', function() {
+              var result = Join.mergeJoin(t.left, t.right, t.field, t.join);
+              expect(result).toEqual(t.expected);
+            });
+          }
 
-          it('with an array', function() {
-            var result = Join.mergeJoin(t.left, t.right, [t.field], t.join);
-            expect(result).toEqual(t.expected);
-          });
+          if (t.hasOwnProperty('fields')) {
+            it('with an array', function() {
+              var result = Join.mergeJoin(t.left, t.right, t.fields, t.join);
+              expect(result).toEqual(t.expected);
+            });
+          }
         });
       });
-
-      it('should do cross join');
     });
 
     describe('called fluently', function() {
       tests.forEach(function(t) {
-        describe('should do ' + t.name + '-join', function() {
-          it('with a function', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .mergeJoin(t.right, t.comparator, t.join)
-              .execute();
-            expect(result).toEqual(t.expected);
-          });
+        describe('should do ' + t.name, function() {
+          if (t.hasOwnProperty('comparator')) {
+            it('with a function', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .mergeJoin(t.right, t.comparator, t.join)
+                .execute();
+              expect(result).toEqual(t.expected);
+            });
+          }
 
-          it('with a string', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .mergeJoin(t.right, t.field, t.join)
-              .execute();
-            expect(result).toEqual(t.expected);
-          });
+          if (t.hasOwnProperty('field')) {
+            it('with a string', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .mergeJoin(t.right, t.field, t.join)
+                .execute();
+              expect(result).toEqual(t.expected);
+            });
+          }
 
-          it('with an array', function() {
-            var result = Join
-              .selectFrom(t.left)
-              .mergeJoin(t.right, [t.field], t.join)
-              .execute();
-            expect(result).toEqual(t.expected);
-          });
+          if (t.hasOwnProperty('fields')) {
+            it('with an array', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .mergeJoin(t.right, t.fields, t.join)
+                .execute();
+              expect(result).toEqual(t.expected);
+            });
+          }
         });
       });
-
-      it('should do cross join');
     });
 
   });
