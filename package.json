@@ -16,6 +16,6 @@
   "scripts": {
     "postinstall": "bower install",
     "prestart": "npm install",
-    "test": "karma start test/karma.conf.js --single-run --browsers Firefox,PhantomJS"
+    "test": "./node_modules/karma/bin/karma start test/karma.conf.js --single-run --browsers Firefox,PhantomJS"
   }
 }
