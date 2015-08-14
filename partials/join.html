@@ -28,8 +28,18 @@
       </array-table>
     </div>
     <div class="col-md-6">
-      <h3>Joined</h3>
-      <array-table data="demo.results.hash" fields="demo.outFields" readonly>
+      <h3>
+        Joined
+        <div class="btn-group btn-group-xs pull-right" role="group">
+          <button ng-repeat="(key, result) in demo.results"
+                  type="button" class="btn btn-default"
+                  ng-class="{active: demo.result == key}"
+                  ng-click="demo.result = key">
+            {{key}}-join
+          </button>
+        </div>
+      </h3>
+      <array-table data="demo.results[demo.result]" fields="demo.outFields" readonly>
       </array-table>
     </div>
   </div>
@@ -44,8 +54,18 @@
       <div hljs source="demo.right | json"></div>
     </div>
     <div class="col-md-6">
-      <h3>Joined</h3>
-      <div hljs source="demo.results.hash | json"></div>
+      <h3>
+        Joined
+        <div class="btn-group btn-group-xs pull-right" role="group">
+          <button ng-repeat="(key, result) in demo.results"
+                  type="button" class="btn btn-default"
+                  ng-class="{active: demo.result == key}"
+                  ng-click="demo.result = key">
+            {{key}}-join
+          </button>
+        </div>
+      </h3>
+      <div hljs source="demo.results[demo.result] | json"></div>
     </div>
   </div>
 

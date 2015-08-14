@@ -244,16 +244,16 @@ function($scope, Formatter, Join) {
 
   $scope.updateDemo = function(demo) {
     demo.results = {
-      sort: Join.sortGroupBy(demo.input, demo.compare, demo.group),
-      hash: Join.hashGroupBy(demo.input, demo.hash, demo.group)
+      hash: Join.hashGroupBy(demo.input, demo.hash, demo.group),
+      sort: Join.sortGroupBy(demo.input, demo.compare, demo.group)
     };
 
     demo.code = {
-      sort: Formatter.fcnCall(
-        'return Join.sortGroupBy(', ['input', demo.compare, demo.group]
-      ),
       hash: Formatter.fcnCall(
         'return Join.hashGroupBy(', ['input', demo.hash, demo.group]
+      ),
+      sort: Formatter.fcnCall(
+        'return Join.sortGroupBy(', ['input', demo.compare, demo.group]
       )
     };
   };
@@ -261,5 +261,6 @@ function($scope, Formatter, Join) {
   $scope.demos.forEach(function(demo) {
     demo.showing = 'table';
     $scope.updateDemo(demo);
+    demo.result = 'hash';
   });
 }]);

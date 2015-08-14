@@ -303,16 +303,16 @@ function($scope, Formatter, Join) {
 
   $scope.updateDemo = function(demo) {
     demo.results = {
-      merge: Join.mergeJoin(demo.left, demo.right, demo.compare, demo.join),
-      hash: Join.hashJoin(demo.left, demo.right, demo.hash, demo.join)
+      hash: Join.hashJoin(demo.left, demo.right, demo.hash, demo.join),
+      merge: Join.mergeJoin(demo.left, demo.right, demo.compare, demo.join)
     };
 
     demo.code = {
-      merge: Formatter.fcnCall(
-        'return Join.mergeJoin(', ['left', 'right', demo.compare, demo.join]
-      ),
       hash: Formatter.fcnCall(
         'return Join.hashJoin(', ['left', 'right', demo.hash, demo.join]
+      ),
+      merge: Formatter.fcnCall(
+        'return Join.mergeJoin(', ['left', 'right', demo.compare, demo.join]
       )
     };
   }
@@ -320,5 +320,6 @@ function($scope, Formatter, Join) {
   $scope.demos.forEach(function(demo) {
     demo.showing = 'table';
     $scope.updateDemo(demo);
+    demo.result = 'hash';
   });
 }]);
