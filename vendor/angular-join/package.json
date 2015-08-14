@@ -2,10 +2,20 @@
   "name": "angular-join",
   "description": "An AngularJS service for RDBMS join operations",
   "devDependencies": {
-    "bower": ">=1.3.x"
+    "bower": "~1.4",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.9",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-jasmine": "^0.3.6",
+    "karma-jasmine-html-reporter": "^0.1.8",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-safari-launcher": "^0.1.1",
+    "phantomjs": "^1.9.18"
   },
   "scripts": {
     "postinstall": "bower install",
-    "prestart": "npm install"
+    "prestart": "npm install",
+    "test": "./node_modules/karma/bin/karma start test/karma.conf.js --single-run --browsers Firefox,PhantomJS"
   }
 }

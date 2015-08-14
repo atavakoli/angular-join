@@ -14,7 +14,7 @@
     "Ali Tavakoli"
   ],
   "dependencies": {
-    "angular": ">=1.3.x"
+    "angular": "~1.4"
   },
   "repository": {
     "type": "git",
@@ -24,18 +24,22 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "bower_components",
+    "lib",
     "test",
     "tests"
   ],
-  "version": "0.1.1",
-  "_release": "0.1.1",
+  "devDependencies": {
+    "angular-mocks": "~1.4"
+  },
+  "version": "0.2.0",
+  "_release": "0.2.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.1",
-    "commit": "836b5662889f43444963f03a4ee8b0afce694880"
+    "tag": "0.2.0",
+    "commit": "2af80483954346eda10344f311a816a3514b1cef"
   },
   "_source": "git://github.com/atavakoli/angular-join.git",
-  "_target": "*",
-  "_originalSource": "angular-join"
+  "_target": "~0.2.0",
+  "_originalSource": "angular-join",
+  "_direct": true
 }
