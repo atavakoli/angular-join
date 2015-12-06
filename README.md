@@ -279,7 +279,7 @@ syntactic sugar.
 
 ```javascript
 query
-  .orderBy(comparator) // or .sort(comparator)
+  .orderBy(comparator[, options]) // or .sort(comparator[, options])
 ```
 
 #### Arguments
@@ -301,6 +301,16 @@ query
   - If an array of property names is passed in, then the query elements are
     sorted in ascending order by each property in sequence, following the same
     logic on each property as described above.
+- `options` (object)
+  - *Optional*
+  - Object containing the following properties:
+    - `localeCompare` (boolean): If `true`, this signifies that strings should
+      be sorted using the `localeCompare` function. If `false` (default),
+      strings are sorted according to each character's Unicode code point value.
+      This parameter is only used if `comparator` is a string or an array of
+      property names.  Setting this parameter to `true` results in  generally
+      slower sorts for string properties, but may be necessary if the properties
+      are locale-sensitive.
 
 #### Returns
 
@@ -523,6 +533,13 @@ query
     - `sorted` (boolean): If `true`, this signifies that both input arrays are
       already sorted according to `comparator`. This provides a significant
       performance boost. Default is `false`.
+    - `localeCompare` (boolean): If `true`, this signifies that strings should
+      be sorted using the `localeCompare` function. If `false` (default),
+      strings are sorted according to each character's Unicode code point value.
+      This parameter is only used if `comparator` is a string or an array of
+      property names.  Setting this parameter to `true` results in  generally
+      slower sorts for string properties, but may be necessary if the properties
+      are locale-sensitive.
 
 #### Returns
 
@@ -646,6 +663,13 @@ query
     - `sorted` (boolean): If `true`, this signifies that both input arrays are
       already sorted according to `comparator`. This provides a significant
       performance boost. Default is `false`.
+    - `localeCompare` (boolean): If `true`, this signifies that strings should
+      be sorted using the `localeCompare` function. If `false` (default),
+      strings are sorted according to each character's Unicode code point value.
+      This parameter is only used if `comparator` is a string or an array of
+      property names.  Setting this parameter to `true` results in  generally
+      slower sorts for string properties, but may be necessary if the properties
+      are locale-sensitive.
 
 #### Returns
 
