@@ -99,6 +99,18 @@
             already sorted according to <code>comparator</code>. This provides
             a significant performance boost. Default is <code>false</code>.
           </li>
+          <li>
+            <code>localeCompare</code>
+            <span class="label label-primary">boolean</span> :
+            If <code>true</code>, this signifies that strings should be sorted
+            using the <code>localeCompare</code> function. If <code>false</code>,
+            strings are sorted according to each character's Unicode code point
+            value. This parameter is only used if <code>comparator</code> is a
+            string or an array of property names.  Setting this parameter to
+            <code>true</code> results in  generally slower sorts for string
+            properties, but may be necessary if the properties are
+            locale-sensitive. Default is <code>false</code>.
+          </li>
         </ul>
       </td>
     </tr>
