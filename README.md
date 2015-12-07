@@ -75,6 +75,9 @@ one place and executed in another. If called with the `{async: true}` option,
 a [promise object][] is returned instead, which is resolved with the final
 array and notified with the intermediate results of each operation in the query.
 
+Query objects are instances of `JoinQuery` and are immutable; each operation
+(with the exception of `execute`) results in the creation of a new object.
+
 
 ### selectFrom
 

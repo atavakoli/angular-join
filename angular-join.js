@@ -320,97 +320,129 @@ angular.module('angular-join', [])
    * FLUENT INTERFACE *
    ********************/
 
-  function selectFrom(input, selectCallback) {
-    var query = {
-      a: input,
-      ops: [],
-      mergeJoin: function(a2, comparator, callback) {
-        this.ops.push([mergeJoin, a2, comparator, callback]);
-        return this;
-      },
-      hashJoin: function(a2, hashFcn, callback) {
-        this.ops.push([hashJoin, a2, hashFcn, callback]);
-        return this;
-      },
-      sortGroupBy: function(comparator, callback) {
-        this.ops.push([sortGroupBy, comparator, callback]);
-        return this;
-      },
-      hashGroupBy: function(hashFcn, callback) {
-        this.ops.push([hashGroupBy, hashFcn, callback]);
-        return this;
-      },
-      map: function(callback) {
-        this.ops.push([Array.prototype.map, normalizeSelect(callback)]);
-        return this;
-      },
-      select: function(callback) {
-        // just an alias for map
-        return this.map(callback);
-      },
-      filter: function(callback) {
-        this.ops.push([Array.prototype.filter, callback]);
-        return this;
-      },
-      where: function(callback) {
-        // just an alias for filter
-        return this.filter(callback);
-      },
-      having: function(callback) {
-        // just an alias for filter
-        return this.filter(callback);
-      },
-      sort: function(comparator, options) {
-        this.ops.push([function sortCopy(comparator) {
-          return this.slice().sort(comparator);
-        }, normalizeComparator(comparator, options)]);
-        return this;
-      },
-      orderBy: function(comparator) {
-        // just an alias for sort
-        return this.sort(comparator);
-      },
-      slice: function(begin, end) {
-        this.ops.push([Array.prototype.slice, begin || 0, end]);
-        return this;
-      },
-      limit: function(len, offset) {
-        offset = offset || 0;
-        return this.slice(offset, len + offset);
-      },
-      offset: function(offset) {
-        // just syntactic sugar for slice with 1 parameter
-        return this.slice(offset || 0);
-      },
-      inspect: function(callback) {
-        this.ops.push([function() { callback(this); return this; }]);
-        return this;
-      },
-      execute: function(options) {
-        var _self = this;
+  function JoinQuery(input) {
+    if (input instanceof JoinQuery) {
+      this.a = input.a;
+      this.ops = input.ops.slice();
+    } else {
+      this.a = input;
+      this.ops = [];
+    }
 
-        function _execute(deferred) {
-          var result = _self.a;
-          _self.ops.forEach(function(op) {
-            result = op[0].apply(result, op.slice(1));
-            if (deferred && deferred.notify) {
-              deferred.notify(result);
-            }
-          });
-          return result;
-        }
+    this.mergeJoin = function(a2, comparator, callback, options) {
+      var query = new JoinQuery(this);
+      query.ops.push([mergeJoin, a2, comparator, callback]);
+      return query;
+    };
 
-        if (!!options && !!options.async) {
-          var deferred = $q.defer();
-          $timeout(function() {
-            deferred.resolve(_execute(deferred));
-          });
-          return deferred.promise;
-        } else {
-          return _execute();
-        }
+    this.hashJoin = function(a2, hashFcn, callback) {
+      var query = new JoinQuery(this);
+      query.ops.push([hashJoin, a2, hashFcn, callback]);
+      return query;
+    };
+
+    this.sortGroupBy = function(comparator, callback, options) {
+      var query = new JoinQuery(this);
+      query.ops.push([sortGroupBy, comparator, callback]);
+      return query;
+    };
+
+    this.hashGroupBy = function(hashFcn, callback) {
+      var query = new JoinQuery(this);
+      query.ops.push([hashGroupBy, hashFcn, callback]);
+      return query;
+    };
+
+    this.map = function(callback) {
+      var query = new JoinQuery(this);
+      query.ops.push([Array.prototype.map, normalizeSelect(callback)]);
+      return query;
+    };
+
+    this.select = function(callback) {
+      // just an alias for map
+      return this.map(callback);
+    };
+
+    this.filter = function(callback) {
+      var query = new JoinQuery(this);
+      query.ops.push([Array.prototype.filter, callback]);
+      return query;
+    };
+
+    this.where = function(callback) {
+      // just an alias for filter
+      return this.filter(callback);
+    };
+
+    this.having = function(callback) {
+      // just an alias for filter
+      return this.filter(callback);
+    };
+
+    this.sort = function(comparator, options) {
+      var query = new JoinQuery(this);
+      query.ops.push([function sortCopy(comparator) {
+        return this.slice().sort(comparator);
+      }, normalizeComparator(comparator, options)]);
+      return query;
+    };
+
+    this.orderBy = function(comparator, options) {
+      // just an alias for sort
+      return this.sort(comparator, options);
+    };
+
+    this.slice = function(begin, end) {
+      var query = new JoinQuery(this);
+      query.ops.push([Array.prototype.slice, begin || 0, end]);
+      return query;
+    };
+
+    this.limit = function(len, offset) {
+      offset = offset || 0;
+      return this.slice(offset, len + offset);
+    };
+
+    this.offset = function(offset) {
+      // just syntactic sugar for slice with 1 parameter
+      return this.slice(offset || 0);
+    };
+
+    this.inspect = function(callback) {
+      var query = new JoinQuery(this);
+      query.ops.push([function() { callback(this); return this; }]);
+      return query;
+    };
+
+    this.execute = function(options) {
+      var _self = this;
+
+      function _execute(deferred) {
+        var result = _self.a;
+        _self.ops.forEach(function(op) {
+          result = op[0].apply(result, op.slice(1));
+          if (deferred && deferred.notify) {
+            deferred.notify(result);
+          }
+        });
+        return result;
+      }
+
+      if (!!options && !!options.async) {
+        var deferred = $q.defer();
+        $timeout(function() {
+          deferred.resolve(_execute(deferred));
+        });
+        return deferred.promise;
+      } else {
+        return _execute();
       }
     };
+  }
+
+  function selectFrom(input, selectCallback) {
+    var query = new JoinQuery(input);
 
     if (typeof selectCallback == 'function') {
       query = query.select(normalizeSelect(selectCallback));
