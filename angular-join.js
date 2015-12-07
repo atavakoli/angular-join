@@ -28,14 +28,26 @@ angular.module('angular-join', [])
     }
   }
 
-  function normalizeComparator(comparator) {
+  function normalizeComparator(comparator, options) {
+    var stringCompare;
+    if (options && options.localeCompare) {
+      stringCompare = function(s1, s2) {
+        return s1.localeCompare(s2);
+      }
+    } else {
+      stringCompare = function(s1, s2) {
+        return s1 < s2 ? -1 : s1 > s2 ? 1 : 0;
+      }
+    }
+
     if (typeof comparator == 'string' || comparator instanceof String) {
       if (comparator instanceof String) {
         comparator = comparator.valueOf();
       }
+
       return function(e1, e2) {
-        if (typeof e1[comparator].localeCompare == 'function') {
-          return e1[comparator].localeCompare(e2[comparator]);
+        if (typeof e1[comparator] == 'string' || e1[comparator] instanceof String) {
+          return stringCompare(e1[comparator], e2[comparator]);
         } else if (typeof e1[comparator].diff == 'function') {
           return e1[comparator].diff(e2[comparator]);
         } else {
@@ -46,8 +58,8 @@ angular.module('angular-join', [])
       return function(e1, e2) {
         var result = 0;
         comparator.some(function(prop) {
-          if (typeof e1[prop].localeCompare == 'function') {
-            result = e1[prop].localeCompare(e2[prop]);
+          if (typeof e1[prop] == 'string' || e1[prop] instanceof String) {
+            result = stringCompare(e1[prop], e2[prop]);
           } else if (typeof e1[prop].diff == 'function') {
             result = e1[prop].diff(e2[prop]);
           } else {
@@ -90,7 +102,7 @@ angular.module('angular-join', [])
     var a1 = this;
     var a3 = [];
 
-    comparator = normalizeComparator(comparator);
+    comparator = normalizeComparator(comparator, options);
 
     if (!options || !options.sorted) {
       a1 = a1.slice().sort(comparator);
@@ -261,7 +273,7 @@ angular.module('angular-join', [])
       return results;
     }
 
-    comparator = normalizeComparator(comparator);
+    comparator = normalizeComparator(comparator, options);
 
     if (!options || !options.sorted) {
       a = a.slice().sort(comparator);
@@ -348,10 +360,10 @@ angular.module('angular-join', [])
         // just an alias for filter
         return this.filter(callback);
       },
-      sort: function(comparator) {
+      sort: function(comparator, options) {
         this.ops.push([function sortCopy(comparator) {
           return this.slice().sort(comparator);
-        }, normalizeComparator(comparator)]);
+        }, normalizeComparator(comparator, options)]);
         return this;
       },
       orderBy: function(comparator) {
