@@ -3,7 +3,7 @@
 
 angular.module('angular-join', [])
 
-.factory('Join', function() {
+.factory('Join', ['$q', function($q) {
 
   /***************
    * NORMALIZERS *
@@ -82,7 +82,7 @@ angular.module('angular-join', [])
         result[callback] = e[callback];
         return result;
       }
-    } else if (typeof callback == 'object' && callback.isArray()) {
+    } else if (typeof callback == 'object' && Array.isArray(callback)) {
       return function(e) {
         return callback.reduce(function(prev, prop) {
           prev[prop] = e[prop];
@@ -321,41 +321,36 @@ angular.module('angular-join', [])
    ********************/
 
   function JoinQuery(input) {
-    if (input instanceof JoinQuery) {
-      this.a = input.a;
-      this.ops = input.ops.slice();
-    } else {
-      this.a = input;
-      this.ops = [];
-    }
+    this.a = input;
+    this.op = null;
 
     this.mergeJoin = function(a2, comparator, callback, options) {
       var query = new JoinQuery(this);
-      query.ops.push([mergeJoin, a2, comparator, callback]);
+      query.op = [mergeJoin, a2, comparator, callback];
       return query;
     };
 
     this.hashJoin = function(a2, hashFcn, callback) {
       var query = new JoinQuery(this);
-      query.ops.push([hashJoin, a2, hashFcn, callback]);
+      query.op = [hashJoin, a2, hashFcn, callback];
       return query;
     };
 
     this.sortGroupBy = function(comparator, callback, options) {
       var query = new JoinQuery(this);
-      query.ops.push([sortGroupBy, comparator, callback]);
+      query.op = [sortGroupBy, comparator, callback];
       return query;
     };
 
     this.hashGroupBy = function(hashFcn, callback) {
       var query = new JoinQuery(this);
-      query.ops.push([hashGroupBy, hashFcn, callback]);
+      query.op = [hashGroupBy, hashFcn, callback];
       return query;
     };
 
     this.map = function(callback) {
       var query = new JoinQuery(this);
-      query.ops.push([Array.prototype.map, normalizeSelect(callback)]);
+      query.op = [Array.prototype.map, normalizeSelect(callback)];
       return query;
     };
 
@@ -366,7 +361,7 @@ angular.module('angular-join', [])
 
     this.filter = function(callback) {
       var query = new JoinQuery(this);
-      query.ops.push([Array.prototype.filter, callback]);
+      query.op = [Array.prototype.filter, callback];
       return query;
     };
 
@@ -382,9 +377,9 @@ angular.module('angular-join', [])
 
     this.sort = function(comparator, options) {
       var query = new JoinQuery(this);
-      query.ops.push([function sortCopy(comparator) {
+      query.op = [function sortCopy(comparator) {
         return this.slice().sort(comparator);
-      }, normalizeComparator(comparator, options)]);
+      }, normalizeComparator(comparator, options)];
       return query;
     };
 
@@ -395,7 +390,7 @@ angular.module('angular-join', [])
 
     this.slice = function(begin, end) {
       var query = new JoinQuery(this);
-      query.ops.push([Array.prototype.slice, begin || 0, end]);
+      query.op = [Array.prototype.slice, begin || 0, end];
       return query;
     };
 
@@ -411,32 +406,45 @@ angular.module('angular-join', [])
 
     this.inspect = function(callback) {
       var query = new JoinQuery(this);
-      query.ops.push([function() { callback(this); return this; }]);
+      query.op = [function() { callback(this); return this; }];
       return query;
     };
 
     this.execute = function(options) {
-      var _self = this;
+      var result;
 
-      function _execute(deferred) {
-        var result = _self.a;
-        _self.ops.forEach(function(op) {
-          result = op[0].apply(result, op.slice(1));
-          if (deferred && deferred.notify) {
-            deferred.notify(result);
-          }
-        });
-        return result;
-      }
-
-      if (!!options && !!options.async) {
+      if (options && options.async) {
         var deferred = $q.defer();
-        $timeout(function() {
-          deferred.resolve(_execute(deferred));
-        });
+
+        if (this.a instanceof JoinQuery) {
+          var self = this;
+          this.a.execute(options).then(function(result) {
+            if (self.op) {
+              result = self.op[0].apply(result, self.op.slice(1));
+            }
+            deferred.resolve(result);
+          });
+        } else {
+          result = this.a;
+          if (this.op) {
+            result = this.op[0].apply(result, this.op.slice(1));
+          }
+          deferred.resolve(result);
+        }
+
         return deferred.promise;
       } else {
-        return _execute();
+        if (this.a instanceof JoinQuery) {
+          result = this.a.execute(options);
+        } else {
+          result = this.a;
+        }
+
+        if (this.op) {
+          result = this.op[0].apply(result, this.op.slice(1));
+        }
+
+        return result;
       }
     };
   }
@@ -445,7 +453,7 @@ angular.module('angular-join', [])
     var query = new JoinQuery(input);
 
     if (typeof selectCallback == 'function') {
-      query = query.select(normalizeSelect(selectCallback));
+      query = query.select(selectCallback);
     }
 
     return query;
@@ -467,7 +475,7 @@ angular.module('angular-join', [])
   var service = { selectFrom: selectFrom };
 
   // Add all the functions in a query (except inspect & execute) to the service
-  //  so that they can be called statically
+  // so that they can be called statically
   angular.forEach(selectFrom([]), function(prop, key) {
     if (['inspect', 'execute'].indexOf(key) < 0 && typeof prop == 'function') {
       service[key] = queryWrapper(key);
@@ -475,6 +483,6 @@ angular.module('angular-join', [])
   });
 
   return service;
-});
+}]);
 
 }());
