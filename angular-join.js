@@ -324,6 +324,7 @@ angular.module('angular-join', [])
     this.a = input;
     this.op = op;
     this.params = params || [];
+    this.result = null;
 
     this.mergeJoin = function(a2, comparator, callback, options) {
       return new JoinQuery(this, mergeJoin, [a2, comparator, callback, options]);
@@ -398,40 +399,45 @@ angular.module('angular-join', [])
     };
 
     this.execute = function(options) {
-      var result;
-
       if (options && options.async) {
         var deferred = $q.defer();
 
-        if (this.a instanceof JoinQuery) {
+        if (!(options && options.force) && this.result !== null) {
+          deferred.resolve(this.result);
+        } else if (this.a instanceof JoinQuery) {
           var self = this;
           this.a.execute(options).then(function(result) {
+            self.result = result;
             if (self.op) {
-              result = self.op.apply(result, self.params);
+              self.result = self.op.apply(self.result, self.params);
             }
-            deferred.resolve(result);
+            deferred.resolve(self.result);
           });
         } else {
-          result = this.a;
+          this.result = this.a;
           if (this.op) {
-            result = this.op.apply(result, this.params);
+            this.result = this.op.apply(this.result, this.params);
           }
-          deferred.resolve(result);
+          deferred.resolve(this.result);
         }
 
         return deferred.promise;
       } else {
-        if (this.a instanceof JoinQuery) {
-          result = this.a.execute(options);
+        if (!(options && options.force) && this.result !== null) {
+          return this.result;
         } else {
-          result = this.a;
-        }
+          if (this.a instanceof JoinQuery) {
+            this.result = this.a.execute(options);
+          } else {
+            this.result = this.a;
+          }
 
-        if (this.op) {
-          result = this.op.apply(result, this.params);
-        }
+          if (this.op) {
+            this.result = this.op.apply(this.result, this.params);
+          }
 
-        return result;
+          return this.result;
+        }
       }
     };
   }
