@@ -320,38 +320,29 @@ angular.module('angular-join', [])
    * FLUENT INTERFACE *
    ********************/
 
-  function JoinQuery(input) {
+  function JoinQuery(input, op, params) {
     this.a = input;
-    this.op = null;
+    this.op = op;
+    this.params = params || [];
 
     this.mergeJoin = function(a2, comparator, callback, options) {
-      var query = new JoinQuery(this);
-      query.op = [mergeJoin, a2, comparator, callback];
-      return query;
+      return new JoinQuery(this, mergeJoin, [a2, comparator, callback, options]);
     };
 
     this.hashJoin = function(a2, hashFcn, callback) {
-      var query = new JoinQuery(this);
-      query.op = [hashJoin, a2, hashFcn, callback];
-      return query;
+      return new JoinQuery(this, hashJoin, [a2, hashFcn, callback]);
     };
 
     this.sortGroupBy = function(comparator, callback, options) {
-      var query = new JoinQuery(this);
-      query.op = [sortGroupBy, comparator, callback];
-      return query;
+      return new JoinQuery(this, sortGroupBy, [comparator, callback, options]);
     };
 
     this.hashGroupBy = function(hashFcn, callback) {
-      var query = new JoinQuery(this);
-      query.op = [hashGroupBy, hashFcn, callback];
-      return query;
+      return new JoinQuery(this, hashGroupBy, [hashFcn, callback]);
     };
 
     this.map = function(callback) {
-      var query = new JoinQuery(this);
-      query.op = [Array.prototype.map, normalizeSelect(callback)];
-      return query;
+      return new JoinQuery(this, Array.prototype.map, [normalizeSelect(callback)]);
     };
 
     this.select = function(callback) {
@@ -360,8 +351,7 @@ angular.module('angular-join', [])
     };
 
     this.filter = function(callback) {
-      var query = new JoinQuery(this);
-      query.op = [Array.prototype.filter, callback];
+      return new JoinQuery(this, Array.prototype.filter, [callback]);
       return query;
     };
 
@@ -376,11 +366,9 @@ angular.module('angular-join', [])
     };
 
     this.sort = function(comparator, options) {
-      var query = new JoinQuery(this);
-      query.op = [function sortCopy(comparator) {
+      return new JoinQuery(this, function sortCopy(comparator) {
         return this.slice().sort(comparator);
-      }, normalizeComparator(comparator, options)];
-      return query;
+      }, [normalizeComparator(comparator, options)]);
     };
 
     this.orderBy = function(comparator, options) {
@@ -389,9 +377,7 @@ angular.module('angular-join', [])
     };
 
     this.slice = function(begin, end) {
-      var query = new JoinQuery(this);
-      query.op = [Array.prototype.slice, begin || 0, end];
-      return query;
+      return new JoinQuery(this, Array.prototype.slice, [begin, end]);
     };
 
     this.limit = function(len, offset) {
@@ -401,13 +387,14 @@ angular.module('angular-join', [])
 
     this.offset = function(offset) {
       // just syntactic sugar for slice with 1 parameter
-      return this.slice(offset || 0);
+      return this.slice(offset);
     };
 
     this.inspect = function(callback) {
-      var query = new JoinQuery(this);
-      query.op = [function() { callback(this); return this; }];
-      return query;
+      return new JoinQuery(this, function(callback) {
+        callback(this);
+        return this;
+      }, [callback]);
     };
 
     this.execute = function(options) {
@@ -420,14 +407,14 @@ angular.module('angular-join', [])
           var self = this;
           this.a.execute(options).then(function(result) {
             if (self.op) {
-              result = self.op[0].apply(result, self.op.slice(1));
+              result = self.op.apply(result, self.params);
             }
             deferred.resolve(result);
           });
         } else {
           result = this.a;
           if (this.op) {
-            result = this.op[0].apply(result, this.op.slice(1));
+            result = this.op.apply(result, this.params);
           }
           deferred.resolve(result);
         }
@@ -441,7 +428,7 @@ angular.module('angular-join', [])
         }
 
         if (this.op) {
-          result = this.op[0].apply(result, this.op.slice(1));
+          result = this.op.apply(result, this.params);
         }
 
         return result;
