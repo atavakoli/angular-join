@@ -402,16 +402,18 @@ angular.module('angular-join', [])
       if (options && options.async) {
         var deferred = $q.defer();
 
-        if (!(options && options.force) && this.result !== null) {
-          deferred.resolve(this.result);
-        } else if (this.a instanceof JoinQuery) {
+        if (this.a instanceof JoinQuery) {
           var self = this;
           this.a.execute(options).then(function(result) {
-            self.result = result;
-            if (self.op) {
-              self.result = self.op.apply(self.result, self.params);
+            if (!(options && options.force) && self.result !== null) {
+              deferred.resolve(self.result);
+            } else {
+              self.result = result;
+              if (self.op) {
+                self.result = self.op.apply(self.result, self.params);
+              }
+              deferred.resolve(self.result);
             }
-            deferred.resolve(self.result);
           });
         } else {
           this.result = this.a;

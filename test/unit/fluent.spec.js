@@ -112,6 +112,7 @@ describe('using the fluent interface', function() {
 
     childQuery.execute({ force: true });
     expect(spy.calls.count()).toEqual(8);
+
   });
 
   it('should use the cache by default', function() {
@@ -156,5 +157,94 @@ describe('using the fluent interface', function() {
       });
       $rootScope.$apply();
     });
+
+    it('should not use the cache when forced', function(done) {
+      var spy = jasmine.createSpy('spy');
+
+      var firstQuery = Join
+        .selectFrom(left)
+        .inspect(spy);
+      var childQuery = firstQuery
+        .select('x')
+        .inspect(spy);
+
+      var childResults1;
+
+      firstQuery
+        .execute({ async: true, force: true })
+        .then(function(results) {
+          expect(spy.calls.count()).toEqual(1);
+        })
+        .then(function() {
+          return childQuery.execute({ async: true, force: true });
+        })
+        .then(function(results) {
+          childResults1 = results;
+          expect(spy.calls.count()).toEqual(3);
+        })
+        .then(function() {
+          return childQuery.execute({ async: true, force: true });
+        })
+        .then(function(results) {
+          expect(childResults1).not.toBe(results);
+          expect(spy.calls.count()).toEqual(5);
+        })
+        .then(function() {
+          return childQuery
+            .inspect(spy)
+            .execute({ async: true, force: true });
+        })
+        .then(function(results) {
+          expect(spy.calls.count()).toEqual(8);
+          done();
+        });
+
+      $rootScope.$apply();
+    });
+
+    it('should use the cache by default', function(done) {
+      var spy = jasmine.createSpy('spy');
+
+      var firstQuery = Join
+        .selectFrom(left)
+        .inspect(spy);
+      var childQuery = firstQuery
+        .select('x')
+        .inspect(spy);
+
+      var childResults1;
+
+      firstQuery
+        .execute({ async: true })
+        .then(function(results) {
+          expect(spy.calls.count()).toEqual(1);
+        })
+        .then(function() {
+          return childQuery.execute({ async: true });
+        })
+        .then(function(results) {
+          childResults1 = results;
+          expect(spy.calls.count()).toEqual(2);
+        })
+        .then(function() {
+          return childQuery.execute({ async: true });
+        })
+        .then(function(results) {
+          expect(childResults1).toBe(results);
+          expect(spy.calls.count()).toEqual(2);
+        })
+        .then(function() {
+          return childQuery
+            .inspect(spy)
+            .execute({ async: true });
+        })
+        .then(function(results) {
+          expect(spy.calls.count()).toEqual(3);
+          done();
+        });
+
+      $rootScope.$apply();
+    });
+
   });
 });
