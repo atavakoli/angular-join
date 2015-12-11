@@ -445,7 +445,7 @@ angular.module('angular-join', [])
   function selectFrom(input, selectCallback) {
     var query = new JoinQuery(input);
 
-    if (typeof selectCallback == 'function') {
+    if (selectCallback !== undefined && selectCallback !== null) {
       query = query.select(selectCallback);
     }
 
