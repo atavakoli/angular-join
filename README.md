@@ -112,8 +112,9 @@ Join
 
 #### Arguments
 
-- `input` (array)
-  - The input array to start the query.
+- `input` (array/JoinQuery)
+  - If an array, the input array to start the query.
+  - If a JoinQuery, the result of that query is used to start this query.
 - `callback` (function/string/array)
   - *Optional*
   - Function executed as `callback(e)`, where `e` is an element of `input`.
@@ -446,8 +447,10 @@ query
 
 #### Arguments
 
-- `right` (array)
-  - The righthand array in the join operation.
+- `right` (array/JoinQuery)
+  - If an array, the righthand array in the join operation.
+  - If a JoinQuery, the result of that query is used as the righthand array in
+    the join operation.
 - `hashFcn` (function/string/array)
   - Function executed as `hashFcn(e)`, where `e` is an element of the current
     query result (the "left" array) or `right`, and returning a number or
@@ -509,8 +512,10 @@ query
 
 #### Arguments
 
-- `right` (array)
-  - The righthand array in the join operation.
+- `right` (array/JoinQuery)
+  - If an array, the righthand array in the join operation.
+  - If a JoinQuery, the result of that query is used as the righthand array in
+    the join operation.
 - `comparator` (function/string/array)
   - Function executed as `comparator(e1, e2)`, where `e1` and `e2` are
     elements of the current query result (the "left" array) and `right`,

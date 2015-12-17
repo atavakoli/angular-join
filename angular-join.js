@@ -398,48 +398,70 @@ angular.module('angular-join', [])
       }, [callback]);
     };
 
-    this.execute = function(options) {
-      if (options && options.async) {
-        var deferred = $q.defer();
-
-        if (this.a instanceof JoinQuery) {
-          var self = this;
-          this.a.execute(options).then(function(result) {
-            if (!(options && options.force) && self.result !== null) {
-              deferred.resolve(self.result);
+    function executeAsync(query, options) {
+      return $q.all(query.params.map(function(param) {
+        if (param instanceof JoinQuery) {
+          return param.execute(options);
+        } else {
+          var deferred = $q.defer();
+          deferred.resolve(param);
+          return deferred.promise;
+        }
+      })).then(function(params) {
+        if (!(options && options.force) && query.result !== null) {
+          return query.result;
+        } else if (query.a instanceof JoinQuery) {
+          return query.a.execute(options).then(function(results) {
+            if (!(options && options.force) && query.result !== null) {
+              return query.result;
             } else {
-              self.result = result;
-              if (self.op) {
-                self.result = self.op.apply(self.result, self.params);
+              query.result = results;
+              if (query.op) {
+                query.result = query.op.apply(query.result, params);
               }
-              deferred.resolve(self.result);
+              return query.result;
             }
           });
         } else {
-          this.result = this.a;
-          if (this.op) {
-            this.result = this.op.apply(this.result, this.params);
+          query.result = query.a;
+          if (query.op) {
+            query.result = query.op.apply(query.result, params);
           }
-          deferred.resolve(this.result);
+          return query.result;
         }
+      });
+    }
 
-        return deferred.promise;
+    function executeSync(query, options) {
+      if (!(options && options.force) && query.result !== null) {
+        return query.result;
       } else {
-        if (!(options && options.force) && this.result !== null) {
-          return this.result;
-        } else {
-          if (this.a instanceof JoinQuery) {
-            this.result = this.a.execute(options);
+        var params = query.params.map(function(param) {
+          if (param instanceof JoinQuery) {
+            return param.execute(options);
           } else {
-            this.result = this.a;
+            return param;
           }
+        });
 
-          if (this.op) {
-            this.result = this.op.apply(this.result, this.params);
-          }
-
-          return this.result;
+        if (query.a instanceof JoinQuery) {
+          query.result = query.a.execute(options);
+        } else {
+          query.result = query.a;
         }
+
+        if (query.op) {
+          query.result = query.op.apply(query.result, params);
+        }
+        return query.result;
+      }
+    }
+
+    this.execute = function(options) {
+      if (options && options.async) {
+        return executeAsync(this, options);
+      } else {
+        return executeSync(this, options);
       }
     };
   }
