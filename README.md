@@ -68,12 +68,21 @@ an array as the starting data on which to perform subsequent operations.
 **all operations create a new array to be returned or passed in as the input**
 **of the next operation.**
 
-None of the operations in the query are performed until the `.execute()`
+None of the operations in the query are performed until the `execute`
 function is called, which returns the array resulting from sequentially running
 all the operations queued on the query, which allows them to be constructed in
 one place and executed in another. If called with the `{async: true}` option,
 a [promise object][] is returned instead, which is resolved with the final
-array and notified with the intermediate results of each operation in the query.
+array.
+
+Query objects are instances of `JoinQuery` and each operation (with the
+exception of `execute`) results in the creation of a new object. The first time
+that `execute` is called, the results of the query (and all queries on which
+this one is dependent) are cached, and subsequent calls return the cached
+results instead of recalculating them. This results in more efficient queries,
+especially when one query uses another as its starting point. However, if inputs
+change in between calls to `execute`, the cached results may become stale and
+`execute` should be called with the `{force: true}` option.
 
 
 ### selectFrom
@@ -103,8 +112,9 @@ Join
 
 #### Arguments
 
-- `input` (array)
-  - The input array to start the query.
+- `input` (array/JoinQuery)
+  - If an array, the input array to start the query.
+  - If a JoinQuery, the result of that query is used to start this query.
 - `callback` (function/string/array)
   - *Optional*
   - Function executed as `callback(e)`, where `e` is an element of `input`.
@@ -141,10 +151,13 @@ SELECT ...
 Runs the query and returns the resulting array, or a [promise object][]
 that resolves to the resulting array (see `options` below).
 
-This function may be called more than once on the same query, but in
-non-asynchronous mode (which is the default), the query operations are
-re-executed each time it is called; therefore, it is more efficient in these
-cases to call it once and save the result.
+This function may be called more than once on the same query. The first time
+it is called, the results of the query (and all queries on which this one is
+dependent) are cached, and subsequent calls return the cached results instead
+of recalculating them. This results in more efficient queries, especially when
+one query uses another as its starting point. However, if inputs change in
+between calls, the cached results may become stale and `execute` should be
+called with the `{force: true}` option (see `options` below).
 
 
 #### Syntax
@@ -161,17 +174,20 @@ query
   - Object containing the following properties:
     - `async` (boolean): If true, then instead of returning the resulting
       array, execute the query asynchronously and return a [promise object][]
-      that resolves to the resulting array. The promise's notify callback will
-      be called on each intermediate array returned by each operation in the
-      query, which may be used for debugging. Default is false.
+      that resolves to the resulting array. Default is false.
+    - `force` (boolean): If false, then cached results (if available) from the
+      last call to `execute` are returned. This results in faster queries,
+      but may return stale results if any input arrays have changed since the
+      last execution. If true, then the query is re-executed and its cache (and
+      those of all queries on which this one is dependent) is updated. Default
+      is false.
 
 #### Returns
 
 - array/promise
   - If the `{async: true}` option was not used, the array resulting from
     executing the query is returned. Otherwise, a [promise object][] is
-    returned that resolves to the resulting array, which also gets notified
-    with the intermediate arrays returned by each operation in the query.
+    returned that resolves to the resulting array.
 
 ---
 
@@ -293,7 +309,7 @@ query
     case with every query operation).
   - If a string is passed in, then the query elements are sorted by that
     property in ascending order. If the property itself is a string, then
-    [String.prototype.localeCompare()][] is used to sort the query results; if
+    the sorting strategy is determined by the `localeCompare` option; if
     the property is an object with a `diff()` function, then this function is
     expected to have the same spec as the callback in
     [Array.prototype.sort()][], and it is used to sort the query results.
@@ -305,12 +321,12 @@ query
   - *Optional*
   - Object containing the following properties:
     - `localeCompare` (boolean): If `true`, this signifies that strings should
-      be sorted using the `localeCompare` function. If `false` (default),
-      strings are sorted according to each character's Unicode code point value.
-      This parameter is only used if `comparator` is a string or an array of
-      property names.  Setting this parameter to `true` results in  generally
-      slower sorts for string properties, but may be necessary if the properties
-      are locale-sensitive.
+      be sorted using the [String.prototype.localeCompare()][] function. If
+      `false` (default), strings are sorted according to each character's
+      Unicode code point value. This parameter is only used if `comparator` is
+      a string or an array of property names. Setting this parameter to `true`
+      results in generally slower sorts for string properties, but may be
+      necessary if the properties are locale-sensitive.
 
 #### Returns
 
@@ -431,8 +447,10 @@ query
 
 #### Arguments
 
-- `right` (array)
-  - The righthand array in the join operation.
+- `right` (array/JoinQuery)
+  - If an array, the righthand array in the join operation.
+  - If a JoinQuery, the result of that query is used as the righthand array in
+    the join operation.
 - `hashFcn` (function/string/array)
   - Function executed as `hashFcn(e)`, where `e` is an element of the current
     query result (the "left" array) or `right`, and returning a number or
@@ -494,8 +512,10 @@ query
 
 #### Arguments
 
-- `right` (array)
-  - The righthand array in the join operation.
+- `right` (array/JoinQuery)
+  - If an array, the righthand array in the join operation.
+  - If a JoinQuery, the result of that query is used as the righthand array in
+    the join operation.
 - `comparator` (function/string/array)
   - Function executed as `comparator(e1, e2)`, where `e1` and `e2` are
     elements of the current query result (the "left" array) and `right`,
@@ -505,7 +525,7 @@ query
     function.
   - If a string is passed in, then the query elements are sorted by that
     property in ascending order. If the property itself is a string, then
-    [String.prototype.localeCompare()][] is used to sort the query results; if
+    the sorting strategy is determined by the `localeCompare` option; if
     the property is an object with a `diff()` function, then this function is
     expected to have the same spec as the callback in
     [Array.prototype.sort()][], and it is used to sort the query results.
@@ -534,12 +554,12 @@ query
       already sorted according to `comparator`. This provides a significant
       performance boost. Default is `false`.
     - `localeCompare` (boolean): If `true`, this signifies that strings should
-      be sorted using the `localeCompare` function. If `false` (default),
-      strings are sorted according to each character's Unicode code point value.
-      This parameter is only used if `comparator` is a string or an array of
-      property names.  Setting this parameter to `true` results in  generally
-      slower sorts for string properties, but may be necessary if the properties
-      are locale-sensitive.
+      be sorted using the [String.prototype.localeCompare()][] function. If
+      `false` (default), strings are sorted according to each character's
+      Unicode code point value. This parameter is only used if `comparator` is
+      a string or an array of property names. Setting this parameter to `true`
+      results in generally slower sorts for string properties, but may be
+      necessary if the properties are locale-sensitive.
 
 #### Returns
 
@@ -642,7 +662,7 @@ query
     same group.
   - If a string is passed in, then the query elements are sorted by that
     property in ascending order. If the property itself is a string, then
-    [String.prototype.localeCompare()][] is used to sort the query results; if
+    the sorting strategy is determined by the `localeCompare` option; if
     the property is an object with a `diff()` function, then this function is
     expected to have the same spec as the callback in
     [Array.prototype.sort()][], and it is used to sort the query results.
@@ -664,12 +684,12 @@ query
       already sorted according to `comparator`. This provides a significant
       performance boost. Default is `false`.
     - `localeCompare` (boolean): If `true`, this signifies that strings should
-      be sorted using the `localeCompare` function. If `false` (default),
-      strings are sorted according to each character's Unicode code point value.
-      This parameter is only used if `comparator` is a string or an array of
-      property names.  Setting this parameter to `true` results in  generally
-      slower sorts for string properties, but may be necessary if the properties
-      are locale-sensitive.
+      be sorted using the [String.prototype.localeCompare()][] function. If
+      `false` (default), strings are sorted according to each character's
+      Unicode code point value. This parameter is only used if `comparator` is
+      a string or an array of property names. Setting this parameter to `true`
+      results in generally slower sorts for string properties, but may be
+      necessary if the properties are locale-sensitive.
 
 #### Returns
 
@@ -688,22 +708,23 @@ Inspect the current query result using the provided callback.
 
 This may be inserted in the middle of query construction to inspect or extract
 the array at that point in execution. The provided `callback` function will be
-called with the result array as its only argument. This is similar to using the
-notify callback when calling `.execute({async: true})`, except that (unlike
-the notify callback) different `.inspect()` callbacks may be inserted at
-different points in the query execution.
+called with the result array as its only argument.
 
-The main difference between this function and `.execute()` is that instead of
+The main difference between this function and `execute` is that instead of
 an array or a promise, this function returns the query object, allowing you to
 continue constructing your query. Also, like other operations, the callback is
-not executed until `.execute()` is called.
+not executed until `execute` is called.
 
 The two main use-cases for this function are debugging and efficiency.
 For example, the intermediate results in the Fluent Demo on the
 [documentation page][docs] were constructed using `.inspect()` inserted at
-various points within the construction of a single query. This is more
-efficient and less code than construcing/executing multiple queries for each
-step.
+various points within the construction of a single query, which allows us to see
+each step of the query with less code than constructing/executing multiple
+queries.
+
+Like all other query operations, `inspect` is not executed if the cache is used.
+To force all operations (including `inspect`) to be executed, use the
+`{force:true}` option of `execute`.
 
 
 #### Syntax
@@ -741,7 +762,7 @@ above, `Join.operation(input, ...)` is equivalent to
 
 The static versions currently do not have an asynchronous mode. That is,
 there is no way to have them return a [promise object][] instead of the
-resulting array, as can be done on query objects with `.execute({async:true})`.
+resulting array, as can be done on query objects with `.execute({async: true})`.
 
 
 [docs]: http://atavakoli.github.io/angular-join

@@ -1,4 +1,4 @@
-describe('joining two arrays', function() {
+describe('joining', function() {
   var Join;
 
   beforeEach(module('angular-join'));
@@ -311,7 +311,7 @@ describe('joining two arrays', function() {
     }
   ];
 
-  describe('using a hash-join algorithm', function() {
+  describe('using the hashJoin algorithm', function() {
     var permutationOf = function(a2) {
       return {
         asymmetricMatch: function(a1) {
@@ -397,9 +397,50 @@ describe('joining two arrays', function() {
       });
     });
 
+    describe('called fluently with two queries', function() {
+      tests.forEach(function(t) {
+        describe('should do ' + t.name, function() {
+          var rightQuery;
+          beforeEach(function() {
+            rightQuery = Join.selectFrom(t.right);
+          });
+
+          if (t.hasOwnProperty('hash')) {
+            it('with a function', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(rightQuery, t.hash, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
+
+          if (t.hasOwnProperty('field')) {
+            it('with a string', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(rightQuery, t.field, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
+
+          if (t.hasOwnProperty('fields')) {
+            it('with an array', function() {
+              var result = Join
+                .selectFrom(t.left)
+                .hashJoin(rightQuery, t.fields, t.join)
+                .execute();
+              expect(result).toEqual(permutationOf(t.expected));
+            });
+          }
+        });
+      });
+    });
+
   });
 
-  describe('using a merge-join algorithm', function() {
+  describe('using the mergeJoin algorithm', function() {
     describe('called statically', function() {
       tests.forEach(function(t) {
         describe('should do ' + t.name, function() {
@@ -465,6 +506,53 @@ describe('joining two arrays', function() {
                 var result = Join
                   .selectFrom(t.left)
                   .mergeJoin(t.right, t.fields, t.join, opt)
+                  .execute();
+                expect(result).toEqual(t.expected);
+              });
+            }
+          });
+          });
+        });
+      });
+    });
+
+    describe('called fluently with two queries', function() {
+      tests.forEach(function(t) {
+        describe('should do ' + t.name, function() {
+          var options = t.options || [null];
+
+          options.forEach(function(opt) {
+          describe('with ' + JSON.stringify(opt) + ' options', function() {
+            var rightQuery;
+            beforeEach(function() {
+              rightQuery = Join.selectFrom(t.right);
+            });
+
+            if (t.hasOwnProperty('comparator')) {
+              it('with a function', function() {
+                var result = Join
+                  .selectFrom(t.left)
+                  .mergeJoin(rightQuery, t.comparator, t.join, opt)
+                  .execute();
+                expect(result).toEqual(t.expected);
+              });
+            }
+
+            if (t.hasOwnProperty('field')) {
+              it('with a string', function() {
+                var result = Join
+                  .selectFrom(t.left)
+                  .mergeJoin(rightQuery, t.field, t.join, opt)
+                  .execute();
+                expect(result).toEqual(t.expected);
+              });
+            }
+
+            if (t.hasOwnProperty('fields')) {
+              it('with an array', function() {
+                var result = Join
+                  .selectFrom(t.left)
+                  .mergeJoin(rightQuery, t.fields, t.join, opt)
                   .execute();
                 expect(result).toEqual(t.expected);
               });
