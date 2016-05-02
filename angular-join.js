@@ -504,7 +504,7 @@ function Join(q) {
 
 
 if (typeof module === 'object' && typeof require === 'function') {
-  module.exports = Join(require('Q'));
+  module.exports = Join(require('q'));
 }
 
 if (typeof angular === 'object' && typeof angular.module === 'function') {
