@@ -1,15 +1,13 @@
 (function() {
 'use strict';
 
-angular.module('angular-join', [])
-
-.factory('Join', ['$q', function($q) {
+function Join(q) {
 
   /***************
    * NORMALIZERS *
    ***************/
 
-  function normalizeHashFcn(hashFcn) {
+  var normalizeHashFcn = function(hashFcn) {
     if (typeof hashFcn == 'string' || hashFcn instanceof String) {
       if (hashFcn instanceof String) {
         hashFcn = hashFcn.valueOf();
@@ -26,9 +24,9 @@ angular.module('angular-join', [])
     } else {
       return hashFcn;
     }
-  }
+  };
 
-  function normalizeComparator(comparator, options) {
+  var normalizeComparator = function(comparator, options) {
     var stringCompare;
     if (options && options.localeCompare) {
       stringCompare = function(s1, s2) {
@@ -73,9 +71,9 @@ angular.module('angular-join', [])
     } else {
       return comparator;
     }
-  }
+  };
 
-  function normalizeSelect(callback) {
+  var normalizeSelect = function(callback) {
     if (typeof callback == 'string' || callback instanceof String) {
       return function(e) {
         var result = {};
@@ -92,13 +90,13 @@ angular.module('angular-join', [])
     } else {
       return callback;
     }
-  }
+  };
 
   /********
    * JOIN *
    ********/
 
-  function mergeJoin(a2, comparator, callback, options) {
+  var mergeJoin = function(a2, comparator, callback, options) {
     var a1 = this;
     var a3 = [];
 
@@ -109,7 +107,7 @@ angular.module('angular-join', [])
       a2 = a2.slice().sort(comparator);
     }
 
-    function getContiguousLength(src, start) {
+    var getContiguousLength = function(src, start) {
       if (start < src.length) {
         var i = start + 1;
         while (i < src.length && comparator(src[start], src[i]) === 0) {
@@ -119,27 +117,27 @@ angular.module('angular-join', [])
       } else {
         return 0;
       }
-    }
+    };
 
-    function addLeft(start, end) {
+    var addLeft = function(start, end) {
       for (var i = start; i < end; ++i) {
         var newElement = callback(a1[i], null);
         if (newElement) {
           a3.push(newElement);
         }
       }
-    }
+    };
 
-    function addRight(start, end) {
+    var addRight = function(start, end) {
       for (var i = start; i < end; ++i) {
         var newElement = callback(null, a2[i]);
         if (newElement) {
           a3.push(newElement);
         }
       }
-    }
+    };
 
-    function addCartesianJoin(start1, end1, start2, end2) {
+    var addCartesianJoin = function(start1, end1, start2, end2) {
       for (var i1 = start1; i1 < end1; ++i1) {
         for (var i2 = start2; i2 < end2; ++i2) {
           var newElement = callback(a1[i1], a2[i2]);
@@ -148,7 +146,7 @@ angular.module('angular-join', [])
           }
         }
       }
-    }
+    };
 
     var i1 = 0, i2 = 0;
 
@@ -180,9 +178,9 @@ angular.module('angular-join', [])
     addRight(i2, a2.length);
 
     return a3;
-  }
+  };
 
-  function hashJoin(a2, hashFcn, callback) {
+  var hashJoin = function(a2, hashFcn, callback) {
     var a1 = this;
     var a3 = [];
     var addCallback;
@@ -259,13 +257,13 @@ angular.module('angular-join', [])
     });
 
     return a3;
-  }
+  };
 
   /************
    * GROUP BY *
    ************/
 
-  function sortGroupBy(comparator, callback, options) {
+  var sortGroupBy = function(comparator, callback, options) {
     var a = this;
     var results = [];
 
@@ -292,9 +290,9 @@ angular.module('angular-join', [])
     results.push(grouped);
 
     return results;
-  }
+  };
 
-  function hashGroupBy(hashFcn, callback) {
+  var hashGroupBy = function(hashFcn, callback) {
     var a = this;
     if (a.length === 0) {
       return [];
@@ -314,13 +312,13 @@ angular.module('angular-join', [])
     return Object.keys(hashTable).map(function(hash) {
       return hashTable[hash];
     });
-  }
+  };
 
   /********************
    * FLUENT INTERFACE *
    ********************/
 
-  function JoinQuery(input, op, params) {
+  var JoinQuery = function(input, op, params) {
     this.a = input;
     this.op = op;
     this.params = params || [];
@@ -398,12 +396,12 @@ angular.module('angular-join', [])
       }, [callback]);
     };
 
-    function executeAsync(query, options) {
-      return $q.all(query.params.map(function(param) {
+    var executeAsync = function(query, options) {
+      return q.all(query.params.map(function(param) {
         if (param instanceof JoinQuery) {
           return param.execute(options);
         } else {
-          var deferred = $q.defer();
+          var deferred = q.defer();
           deferred.resolve(param);
           return deferred.promise;
         }
@@ -430,9 +428,9 @@ angular.module('angular-join', [])
           return query.result;
         }
       });
-    }
+    };
 
-    function executeSync(query, options) {
+    var executeSync = function(query, options) {
       if (!(options && options.force) && query.result !== null) {
         return query.result;
       } else {
@@ -455,7 +453,7 @@ angular.module('angular-join', [])
         }
         return query.result;
       }
-    }
+    };
 
     this.execute = function(options) {
       if (options && options.async) {
@@ -464,9 +462,9 @@ angular.module('angular-join', [])
         return executeSync(this, options);
       }
     };
-  }
+  };
 
-  function selectFrom(input, selectCallback) {
+  var selectFrom = function(input, selectCallback) {
     var query = new JoinQuery(input);
 
     if (selectCallback !== undefined && selectCallback !== null) {
@@ -474,9 +472,9 @@ angular.module('angular-join', [])
     }
 
     return query;
-  }
+  };
 
-  function queryWrapper(fcnName) {
+  var queryWrapper = function(fcnName) {
     // takes the 1st argument and uses it as 'this'
     return function() {
       var args = [];
@@ -487,19 +485,33 @@ angular.module('angular-join', [])
       var query = selectFrom(arguments[0]);
       return query[fcnName].apply(query, args).execute();
     };
-  }
+  };
 
   var service = { selectFrom: selectFrom };
 
   // Add all the functions in a query (except inspect & execute) to the service
   // so that they can be called statically
-  angular.forEach(selectFrom([]), function(prop, key) {
+  var proto = selectFrom([]);
+  Object.keys(selectFrom([])).forEach(function(key) {
+    var prop = proto[key];
     if (['inspect', 'execute'].indexOf(key) < 0 && typeof prop == 'function') {
       service[key] = queryWrapper(key);
     }
   });
 
   return service;
-}]);
+}
+
+
+if (typeof module === 'object' && typeof require === 'function') {
+  module.exports = Join(require('q'));
+}
+
+if (typeof angular === 'object' && typeof angular.module === 'function') {
+  angular.module('angular-join', [])
+  .factory('Join', ['$q', function($q) {
+    return Join($q);
+  }]);
+}
 
 }());
