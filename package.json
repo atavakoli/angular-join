@@ -20,6 +20,9 @@
     "name": "Ali Tavakoli",
     "url": "https://github.com/atavakoli"
   },
+  "files": [
+    "angular-join.js"
+  ],
   "dependencies": {
     "q": "~1.4"
   },
@@ -44,6 +47,7 @@
     "prestart": "npm install",
     "test:karma": "karma start test/karma/karma.conf.js --single-run --browsers Firefox,PhantomJS",
     "test:node": "mocha test/node/**/*.spec.js",
+    "pretest": "npm install",
     "test": "npm run test:karma && npm run test:node"
   }
 }
