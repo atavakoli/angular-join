@@ -46,7 +46,7 @@
     "postinstall": "bower install",
     "prestart": "npm install",
     "test:karma": "karma start test/karma/karma.conf.js --single-run --browsers Firefox,PhantomJS",
-    "test:node": "mocha test/node/**/*.spec.js",
+    "test:node": "mocha --timeout 10000 test/node/**/*.spec.js",
     "pretest": "npm install",
     "test": "npm run test:karma && npm run test:node"
   }
