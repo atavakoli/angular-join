@@ -1,21 +1,49 @@
 {
   "name": "angular-join",
-  "description": "An AngularJS service for RDBMS join operations",
+  "description": "A Node and AngularJS service for RDBMS join operations",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atavakoli/angular-join.git"
+  },
+  "license": "MIT",
+  "main": "angular-join.js",
+  "keywords": [
+    "angular",
+    "join",
+    "database",
+    "rdbms",
+    "service",
+    "node",
+    "browser"
+  ],
+  "author": {
+    "name": "Ali Tavakoli",
+    "url": "https://github.com/atavakoli"
+  },
+  "dependencies": {
+    "q": "~1.4"
+  },
   "devDependencies": {
-    "bower": "~1.4",
-    "jasmine-core": "^2.3.4",
-    "karma": "^0.13.9",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-firefox-launcher": "^0.1.6",
-    "karma-jasmine": "^0.3.6",
-    "karma-jasmine-html-reporter": "^0.1.8",
-    "karma-phantomjs-launcher": "^0.2.1",
-    "karma-safari-launcher": "^0.1.1",
-    "phantomjs": "^1.9.18"
+    "bower": "~1.7",
+    "jasmine-core": "~2.4",
+    "karma": "~0.13",
+    "karma-chrome-launcher": "~0.2",
+    "karma-firefox-launcher": "~0.1",
+    "karma-jasmine": "~0.3",
+    "karma-jasmine-html-reporter": "~0.2",
+    "karma-phantomjs-launcher": "~1.0",
+    "karma-safari-launcher": "~0.1",
+    "phantomjs-prebuilt": "~2.1",
+    "mocha": "~2.4",
+    "chai": "~3.5",
+    "sinon": "~1.17",
+    "sinon-chai": "~2.8"
   },
   "scripts": {
     "postinstall": "bower install",
     "prestart": "npm install",
-    "test": "./node_modules/karma/bin/karma start test/karma.conf.js --single-run --browsers Firefox,PhantomJS"
+    "test:karma": "karma start test/karma/karma.conf.js --single-run --browsers Firefox,PhantomJS",
+    "test:node": "mocha test/node/**/*.spec.js",
+    "test": "npm run test:karma && npm run test:node"
   }
 }

@@ -3,9 +3,10 @@ angular-join
 
 [![Build Status][travis-img]][travis]
 [![Bower][bower-img]][bower]
+[![NPM][npm-img]][npm]
 [![License][license-img]](LICENSE)
 
-An AngularJS service providing RDBMS functionality for JavaScript arrays.
+A Node & AngularJS service providing RDBMS functionality for JavaScript arrays.
 
 [Demo/Documentation][docs]
 
@@ -32,23 +33,64 @@ Add `'angular-join'` as a dependency in your Angular app:
 angular.module('myApp', ['angular-join']);
 ```
 
+Angular JOIN can also be installed via NPM:
+
+```
+npm install angular-join --save
+```
+
+The NPM module uses the [Q module by kriskowal][kriskowal-q].
+
 Usage
 -----
 
-This module provides the `Join` service, which exposes functions to create
-SQL-like queries on JavaScript arrays.
+This module provides the `Join` service/module, which exposes functions to
+create SQL-like queries on JavaScript arrays.
+
+### AngularJS
 
 Inject `Join` in your Angular modules as needed. For example:
 
 ```javascript
 angular.module('myApp')
 .controller('MyCtrl', ['$scope', 'Join', function($scope, Join) {
-  // Use the Join service
+  // Use the Join module to build queries
+  var query = Join
+    .selectFrom(...)
+    .where(...)
+    .hashJoin(...)
+    .hashGroupBy(...)
+    .having(...)
+    .orderBy(...)
+    .limit(...);
+
+  var results = query.execute();
 }]);
 ```
 
-The `Join` service is mainly used to create new *query* objects via
-`Join.selectFrom(...)`, but all functions below can also be called statically.
+### Node
+
+In your Node application, `require('angular-join')` will return an object
+containing the functions below:
+
+```javascript
+var Join = require('angular-join');
+
+// Use the Join module to build queries
+var query = Join
+  .selectFrom(...)
+  .where(...)
+  .hashJoin(...)
+  .hashGroupBy(...)
+  .having(...)
+  .orderBy(...)
+  .limit(...);
+
+var results = query.execute();
+```
+
+The `Join` service/module is mainly used to create new *query* objects via
+`Join.selectFrom(...)`, but most functions below can also be called statically.
 
 
 The Query Object
@@ -765,6 +807,8 @@ there is no way to have them return a [promise object][] instead of the
 resulting array, as can be done on query objects with `.execute({async: true})`.
 
 
+[kriskowal-q]: https://www.npmjs.com/package/q
+
 [docs]: http://atavakoli.github.io/angular-join
 [fluent interface]: http://en.wikipedia.org/wiki/Fluent_interface
 [promise object]: http://docs.angularjs.org/api/ng/service/$q
@@ -781,5 +825,8 @@ resulting array, as can be done on query objects with `.execute({async: true})`.
 
 [bower-img]: http://img.shields.io/bower/v/angular-join.svg
 [bower]: http://bower.io/search/?q=angular-join
+
+[npm-img]: https://img.shields.io/npm/v/angular-join.svg
+[npm]: https://www.npmjs.com/package/angular-join
 
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg

@@ -1,10 +1,10 @@
 describe('sorting', function() {
-  var Join;
+  var chai = require('chai');
+  var sinon = require('sinon');
+  chai.use(require('sinon-chai'));
+  var expect = chai.expect;
 
-  beforeEach(module('angular-join'));
-  beforeEach(inject(function(_Join_) {
-    Join = _Join_;
-  }));
+  var Join = require('../../../angular-join.js');
 
   function makeNumeric(start, end) {
     var result = [];
@@ -24,15 +24,15 @@ describe('sorting', function() {
     return result;
   }
 
-  function shuffle(a) {                                                         
-    for (var i = a.length - 1; i > 0; i--) {                                    
-      var j = Math.floor(Math.random() * (i + 1));                              
-      var temp = a[i];                                                          
-      a[i] = a[j];                                                              
-      a[j] = temp;                                                              
-    }                                                                           
-    return a;                                                                   
-  }                                                                             
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
+    }
+    return a;
+  }
 
   function comparator2D(e1, e2) {
     var diff = e1.x - e2.x;
@@ -60,13 +60,13 @@ describe('sorting', function() {
         .selectFrom(shuffled)
         .sort(comparator)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(comparator)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
     });
 
     it('using a string', function() {
@@ -74,13 +74,13 @@ describe('sorting', function() {
         .selectFrom(shuffled)
         .sort('x')
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy('x')
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
     });
 
     it('using an array', function() {
@@ -88,13 +88,13 @@ describe('sorting', function() {
         .selectFrom(shuffled)
         .sort(['x'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(['x'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
     });
 
   });
@@ -117,85 +117,89 @@ describe('sorting', function() {
         .selectFrom(shuffled)
         .sort(stringComparator)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(stringComparator)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
     });
 
     it('using a string', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort('x')
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy('x')
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).not.toHaveBeenCalled();
+      expect(spy).to.not.have.been.called;
+      spy.restore();
     });
 
     it('using a string with localeCompare', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort('x', { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy('x', { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).toHaveBeenCalled();
+      expect(spy).to.have.been.called;
+      spy.restore();
     });
 
     it('using an array', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort(['x'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(['x'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).not.toHaveBeenCalled();
+      expect(spy).not.to.have.been.called;
+      spy.restore();
     });
 
     it('using an array with localeCompare', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort(['x'], { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(['x'], { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).toHaveBeenCalled();
+      expect(spy).to.have.been.called;
+      spy.restore();
     });
 
   });
@@ -218,49 +222,51 @@ describe('sorting', function() {
         .selectFrom(shuffled)
         .sort(comparator2D)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(comparator2D)
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
     });
 
     it('using an array', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort(['x', 'y'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(['x', 'y'])
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).not.toHaveBeenCalled();
+      expect(spy).to.not.have.been.called;
+      spy.restore();
     });
 
     it('using an array with localeCompare', function() {
-      spyOn(String.prototype, 'localeCompare').and.callThrough();
+      var spy = sinon.spy(String.prototype, 'localeCompare');
 
       var newlySorted = Join
         .selectFrom(shuffled)
         .sort(['x', 'y'], { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
       newlySorted = Join
         .selectFrom(shuffled)
         .orderBy(['x', 'y'], { localeCompare: true })
         .execute();
-      expect(newlySorted).toEqual(sorted);
+      expect(newlySorted).to.eql(sorted);
 
-      expect(String.prototype.localeCompare).toHaveBeenCalled();
+      expect(spy).to.have.been.called;
+      spy.restore();
     });
 
   });
